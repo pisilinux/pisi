@@ -14,7 +14,7 @@ import sys
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 import pisi.context as ctx
@@ -122,7 +122,7 @@ def remove_conflicting_packages(conflicts):
 def remove_obsoleted_packages():
     installdb = pisi.db.installdb.InstallDB()
     packagedb = pisi.db.packagedb.PackageDB()
-    obsoletes = filter(installdb.has_package, packagedb.get_obsoletes())
+    obsoletes = list(filter(installdb.has_package, packagedb.get_obsoletes()))
     if obsoletes:
         if remove(obsoletes, ignore_dep=True, ignore_safety=True):
             raise Exception(_("Obsoleted packages remaining"))

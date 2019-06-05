@@ -13,7 +13,7 @@ import os
 
 import gettext
 __trans = gettext.translation("pisi", fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi.context as ctx
 import pisi.package
@@ -181,7 +181,7 @@ def find_relocations(oldfiles, newfiles):
         files_old.setdefault(f.hash, []).append(f)
 
     relocations = []
-    for h in files_new.keys():
+    for h in list(files_new.keys()):
         if h and h in files_old:
             old_paths = [x.path for x in files_old[h]]
             for i in range(len(files_new[h])):

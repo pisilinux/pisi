@@ -12,7 +12,7 @@
 import os
 import gettext
 __trans = gettext.translation("pisi", fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 import pisi.context as ctx
@@ -87,7 +87,7 @@ def fetch_remote_file(package, errors):
     if not os.path.exists(filepath):
         try:
             pisi.fetcher.fetch_url(uri, dest, ctx.ui.Progress)
-        except pisi.fetcher.FetchError, e:
+        except pisi.fetcher.FetchError as e:
             errors.append(package)
             ctx.ui.info(pisi.util.colorize(_("%s could not be found") % (package), "red"))
             return False

@@ -16,7 +16,7 @@ from shutil import copy, copytree
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 # Pisi Modules
 import pisi.util as util
@@ -126,7 +126,7 @@ def _generate_exec_file(dest_dir, exe, java_args, exe_args):
     # Using low level I/O to set permission without calling os.chmod
     exec_file = os.open(util.join_path(exec_dir, get.srcNAME()),
                         os.O_CREAT | os.O_WRONLY,
-                        0755)
+                        0o755)
     os.write(exec_file, EXEC_TEMPLATE % (util.join_path('/', dest_dir),
                                          java_args,
                                          exe,

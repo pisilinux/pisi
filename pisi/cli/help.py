@@ -12,20 +12,18 @@
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi.cli
 import pisi.cli.command as command
 import pisi.context as ctx
 
-class Help(command.Command):
+class Help(command.Command, metaclass=command.autocommand):
     __doc__ = _("""Prints help for given commands
 
 Usage: help [ <command1> <command2> ... <commandn> ]
 
 If run without parameters, it prints the general help.""")
-
-    __metaclass__ = command.autocommand
 
     def __init__(self, args = None):
         super(Help, self).__init__(args)

@@ -60,12 +60,12 @@
 
 import os
 import re
-import StringIO
-import ConfigParser
+import io
+import configparser
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 
@@ -150,7 +150,7 @@ class ConfigurationSection(object):
             self.defaults = DirectoriesDefaults
         else:
             e = _("No section by name '%s'") % section
-            raise Error, e
+            raise Error(e)
 
         self.section = section
 
@@ -182,26 +182,26 @@ class ConfigurationSection(object):
 class ConfigurationFile(object):
     """Parse and get configuration values from the configuration file"""
     def __init__(self, filePath):
-        self.parser = ConfigParser.ConfigParser()
+        self.parser = configparser.ConfigParser()
         self.filePath = filePath
 
         self.parser.read(self.filePath)
 
         try:
             generalitems = self.parser.items("general")
-        except ConfigParser.NoSectionError:
+        except configparser.NoSectionError:
             generalitems = []
         self.general = ConfigurationSection("general", generalitems)
 
         try:
             builditems = self.parser.items("build")
-        except ConfigParser.NoSectionError:
+        except configparser.NoSectionError:
             builditems = []
         self.build = ConfigurationSection("build", builditems)
 
         try:
             dirsitems = self.parser.items("directories")
-        except ConfigParser.NoSectionError:
+        except configparser.NoSectionError:
             dirsitems = []
         self.dirs = ConfigurationSection("directories", dirsitems)
 
@@ -213,7 +213,7 @@ class ConfigurationFile(object):
     def get(self, section, option):
         try:
             return self.parser.get(section, option)
-        except ConfigParser.NoOptionError:
+        except configparser.NoOptionError:
             return None
 
     def set(self, section, option, value):
@@ -221,7 +221,7 @@ class ConfigurationFile(object):
 
     def write_config(self, add_missing=True):
         sections = {}
-        current = StringIO.StringIO()
+        current = io.StringIO()
         replacement = [current]
         sect = None
         opt = None
@@ -269,10 +269,10 @@ class ConfigurationFile(object):
                     if sect:
                         sections[sect] = current
                     sect = mo.group('header')
-                    current = StringIO.StringIO()
+                    current = io.StringIO()
                     replacement.append(current)
                     sects = self.parser.sections()
-                    sects.append(ConfigParser.DEFAULTSECT)
+                    sects.append(configparser.DEFAULTSECT)
                     if sect in sects:
                         current.write(line)
                     # So sections can't start with a continuation line:
@@ -307,14 +307,14 @@ class ConfigurationFile(object):
             # Add any new sections.
             sects = self.parser.sections()
             if len(self.parser._defaults) > 0:
-                sects.append(ConfigParser.DEFAULTSECT)
+                sects.append(configparser.DEFAULTSECT)
             sects.sort()
             for sect in sects:
-                if sect == ConfigParser.DEFAULTSECT:
-                    opts = self.parser._defaults.keys()
+                if sect == configparser.DEFAULTSECT:
+                    opts = list(self.parser._defaults.keys())
                 else:
                     # Must use _section here to avoid defaults.
-                    opts = self.parser._sections[sect].keys()
+                    opts = list(self.parser._sections[sect].keys())
                 opts.sort()
                 if sect in sections:
                     output = sections[sect] or current

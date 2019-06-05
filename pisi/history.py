@@ -14,15 +14,14 @@ import os
 import time
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi.pxml.autoxml as autoxml
 import pisi.pxml.xmlfile as xmlfile
 import pisi.context as ctx
 
-__metaclass__ = autoxml.autoxml
 
-class PackageInfo:
+class PackageInfo(metaclass=autoxml.autoxml):
 
     a_version = [autoxml.String, autoxml.mandatory]
     a_release = [autoxml.String, autoxml.mandatory]
@@ -34,7 +33,7 @@ class PackageInfo:
 
         return "-".join((self.version, self.release, distro_id, arch))
 
-class Repo:
+class Repo(metaclass=autoxml.autoxml):
     a_operation = [autoxml.String, autoxml.mandatory]
 
     t_Name = [autoxml.String, autoxml.mandatory]
@@ -50,7 +49,7 @@ class Repo:
         elif self.operation == "remove":
             pass # TBD
 
-class Package:
+class Package(metaclass=autoxml.autoxml):
 
     a_operation = [autoxml.String, autoxml.mandatory]
     a_type = [autoxml.String, autoxml.optional]
@@ -78,7 +77,8 @@ class Package:
         else:
             return ""
 
-class Operation:
+
+class Operation(metaclass=autoxml.autoxml):
 
     a_type = [autoxml.String, autoxml.mandatory]
     a_date = [autoxml.String, autoxml.mandatory]
@@ -90,9 +90,8 @@ class Operation:
     def __str__(self):
         return self.type
 
-class History(xmlfile.XmlFile):
 
-    __metaclass__ = autoxml.autoxml
+class History(xmlfile.XmlFile, metaclass=autoxml.autoxml):
 
     tag = "PISI"
 
@@ -148,10 +147,10 @@ class History(xmlfile.XmlFile):
 
     def _get_latest(self):
 
-        files = filter(lambda h:h.endswith(".xml"), os.listdir(ctx.config.history_dir()))
+        files = [h for h in os.listdir(ctx.config.history_dir()) if h.endswith(".xml")]
         if not files:
             return "001"
 
-        files.sort(lambda x,y:int(x.split("_")[0]) - int(y.split("_")[0]))
+        files.sort(key=lambda x: int(x.split("_")[0]))
         no, opxml = files[-1].split("_")
         return "%03d" % (int(no) + 1)

@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import testcase
+from . import testcase
 import pisi
 
 class RepoDBTestCase(testcase.TestCase):

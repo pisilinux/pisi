@@ -23,9 +23,8 @@ class HistoryDB(lazydb.LazyDB):
         self.history = pisi.history.History()
 
     def __generate_history(self):
-        logs = filter(lambda x:x.endswith(".xml"), os.listdir(ctx.config.history_dir()))
-        logs.sort(lambda x,y:int(x.split("_")[0]) - int(y.split("_")[0]))
-        logs.reverse()
+        logs = list(filter(lambda x:x.endswith(".xml"), os.listdir(ctx.config.history_dir())))
+        logs.sort(key=lambda x: int(x.split("_")[0]), reverse=True)
         return logs
 
     def create_history(self, operation):
@@ -93,7 +92,7 @@ class HistoryDB(lazydb.LazyDB):
         return allconfigs
 
     def get_till_operation(self, operation):
-        if not filter(lambda x:x.startswith("%03d_" % operation), self.__logs):
+        if not [x for x in self.__logs if x.startswith("%03d_" % operation)]:
             return
 
         for log in self.__logs:
@@ -112,7 +111,7 @@ class HistoryDB(lazydb.LazyDB):
             yield hist.operation
 
     def get_last_repo_update(self, last=1):
-        repoupdates = filter(lambda l:l.endswith("repoupdate.xml"), self.__logs)
+        repoupdates = [l for l in self.__logs if l.endswith("repoupdate.xml")]
         repoupdates.reverse()
         if not len(repoupdates) >= 2:
             return None

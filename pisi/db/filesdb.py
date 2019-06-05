@@ -32,10 +32,10 @@ class FilesDB(lazydb.LazyDB):
         self.__check_filesdb()
 
     def has_file(self, path):
-        return self.filesdb.has_key(hashlib.md5(path).digest())
+        return hashlib.md5(path.encode()).hexdigest() in self.filesdb
 
     def get_file(self, path):
-        return self.filesdb[hashlib.md5(path).digest()], path
+        return self.filesdb[hashlib.md5(path.encode()).hexdigest()], path
 
     def search_file(self, term):
         if self.has_file(term):
@@ -56,12 +56,12 @@ class FilesDB(lazydb.LazyDB):
         self.__check_filesdb()
 
         for f in files.list:
-            self.filesdb[hashlib.md5(f.path).digest()] = pkg
+            self.filesdb[hashlib.md5(f.path.encode()).hexdigest()] = pkg
 
     def remove_files(self, files):
         for f in files:
-            if self.filesdb.has_key(hashlib.md5(f.path).digest()):
-                del self.filesdb[hashlib.md5(f.path).digest()]
+            if hashlib.md5(f.path.encode()).hexdigest() in self.filesdb:
+                del self.filesdb[hashlib.md5(f.path.encode()).hexdigest()]
 
     def destroy(self):
         files_db = os.path.join(ctx.config.info_dir(), ctx.const.files_db)

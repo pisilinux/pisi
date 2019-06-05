@@ -14,7 +14,7 @@ import optparse
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 import pisi.cli.command as command
@@ -32,10 +32,9 @@ a delta package with the changed files.
 """)
 
 
-class Delta(command.Command):
+class Delta(command.Command, metaclass=command.autocommand):
 
     __doc__ = usage
-    __metaclass__ = command.autocommand
 
     def __init__(self, args):
         super(Delta, self).__init__(args)

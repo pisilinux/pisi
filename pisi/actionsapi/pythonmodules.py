@@ -15,7 +15,7 @@ import glob
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 # Pisi Modules
 import pisi.context as ctx
@@ -53,18 +53,18 @@ class RunTimeError(pisi.actionsapi.Error):
 def configure(parameters = ''):
     '''does python setup.py configure'''
     if system('python setup.py configure %s' % (parameters)):
-        raise ConfigureError, _('Configuration failed.')
+        raise ConfigureError(_('Configuration failed.'))
 
 
 def compile(parameters = ''):
     '''compile source with given parameters.'''
     if system('python setup.py build %s' % (parameters)):
-        raise CompileError, _('Make failed.')
+        raise CompileError(_('Make failed.'))
 
 def install(parameters = ''):
     '''does python setup.py install'''
     if system('python setup.py install --root=%s --no-compile -O0 %s' % (get.installDIR(), parameters)):
-        raise InstallError, _('Install failed.')
+        raise InstallError(_('Install failed.'))
 
     docFiles = ('AUTHORS', 'CHANGELOG', 'CONTRIBUTORS', 'COPYING*', 'COPYRIGHT',
                 'Change*', 'KNOWN_BUGS', 'LICENSE', 'MAINTAINERS', 'NEWS',
@@ -78,7 +78,7 @@ def install(parameters = ''):
 def run(parameters = ''):
     '''executes parameters with python'''
     if system('python %s' % (parameters)):
-        raise RunTimeError, _('Running %s failed.') % parameters
+        raise RunTimeError(_('Running %s failed.') % parameters)
 
 def fixCompiledPy(lookInto = '/usr/lib/%s/' % get.curPYTHON()):
     ''' cleans *.py[co] from packages '''

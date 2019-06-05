@@ -16,7 +16,7 @@ import os.path
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 import pisi.context as ctx
@@ -26,7 +26,7 @@ import pisi.metadata
 import pisi.file
 import pisi.files
 import pisi.util as util
-import fetcher
+from . import fetcher
 
 
 class Error(pisi.Error):
@@ -64,7 +64,7 @@ class Package:
 
         try:
             self.impl = archive.ArchiveZip(self.filepath, 'zip', mode)
-        except IOError, e:
+        except IOError as e:
             raise Error(_("Cannot open package file: %s") % e)
 
         self.install_archive = None
@@ -217,7 +217,7 @@ class Package:
                 if os.path.isfile(tarinfo.name) or os.path.islink(tarinfo.name):
                     try:
                         os.unlink(tarinfo.name)
-                    except OSError, e:
+                    except OSError as e:
                         ctx.ui.warning(e)
 
             else:

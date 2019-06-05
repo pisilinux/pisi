@@ -14,7 +14,7 @@ import optparse
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 import pisi.api
@@ -34,10 +34,9 @@ to be downloaded from a repository containing sources.
 """)
 
 
-class Build(command.Command):
+class Build(command.Command, metaclass=command.autocommand):
 
     __doc__ = usage
-    __metaclass__ = command.autocommand
 
     def __init__(self, args):
         super(Build, self).__init__(args)

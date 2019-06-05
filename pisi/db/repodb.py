@@ -12,7 +12,7 @@
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import os
 
@@ -35,7 +35,7 @@ class Repo:
     def __init__(self, indexuri):
         self.indexuri = indexuri
 
-medias = (cd, usb, remote, local) = range(4)
+medias = (cd, usb, remote, local) = list(range(4))
 
 class RepoOrder:
 
@@ -106,14 +106,16 @@ class RepoOrder:
 
         #FIXME: get media order from pisi.conf
         for m in ["cd", "usb", "remote", "local"]:
-            if self.repos.has_key(m):
+            if m in self.repos:
                 order.extend(self.repos[m])
 
         return order
 
     def _update(self, doc):
-        repos_file = os.path.join(ctx.config.info_dir(), ctx.const.repos)
-        open(repos_file, "w").write("%s\n" % doc.toPrettyString())
+        repos_file_path = os.path.join(ctx.config.info_dir(), ctx.const.repos)
+        repo_file = open(repos_file_path, "w")
+        repo_file.write("%s\n" % doc.toPrettyString())
+        repo_file.close()
         self._doc = None
         self.repos = self._get_repos()
 
@@ -173,7 +175,7 @@ class RepoDB(lazydb.LazyDB):
 
         try:
             return piksemel.parse(index_path)
-        except Exception, e:
+        except Exception as e:
             raise RepoError(_("Error parsing repository index information. Index file does not exist or is malformed."))
 
     def get_repo(self, repo):
@@ -185,7 +187,9 @@ class RepoDB(lazydb.LazyDB):
             raise RepoError(_("Repository %s does not exist.") % repo)
 
         urifile_path = pisi.util.join_path(ctx.config.index_dir(), repo, "uri")
-        uri = open(urifile_path, "r").read()
+        urifile = open(urifile_path, "r")
+        uri = urifile.read()
+        urifile.close()
         return uri.rstrip()
 
     def add_repo(self, name, repo_info, at = None):

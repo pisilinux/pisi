@@ -14,13 +14,13 @@ import optparse
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi.api
 import pisi.cli.command as command
 import pisi.context as ctx
 
-class AddRepo(command.Command):
+class AddRepo(command.Command, metaclass=command.autocommand):
     __doc__ = _("""Add a repository
 
 Usage: add-repo <repo> <indexuri>
@@ -30,7 +30,6 @@ Usage: add-repo <repo> <indexuri>
 
 NB: We support only local files (e.g., /a/b/c) and http:// URIs at the moment
 """)
-    __metaclass__ = command.autocommand
 
     def __init__(self, args):
         super(AddRepo, self).__init__(args)

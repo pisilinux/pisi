@@ -46,7 +46,7 @@ class SourceDB(lazydb.LazyDB):
 
         for spec in doc.tags("SpecFile"):
             src_name = spec.getTag("Source").getTagData("Name")
-            sources[src_name] = gzip.zlib.compress(spec.toString())
+            sources[src_name] = gzip.zlib.compress(spec.toString().encode())
             for package in spec.tags("Package"):
                 pkgstosrc[package.getTagData("Name")] = src_name
 
@@ -97,12 +97,12 @@ class SourceDB(lazydb.LazyDB):
             lang = pisi.pxml.autoxml.LocalText.get_lang()
         found = []
         for name, xml in self.sdb.get_items_iter(repo):
-            if terms == filter(lambda term: (fields['name'] and \
+            if terms == [term for term in terms if (fields['name'] and \
                     re.compile(term, re.I).search(name)) or \
                     (fields['summary'] and \
                     re.compile(resum % (lang, term), re.I).search(xml)) or \
                     (fields['desc'] and \
-                    re.compile(redesc % (lang, term), re.I).search(xml)), terms):
+                    re.compile(redesc % (lang, term), re.I).search(xml))]:
                 found.append(name)
         return found
 

@@ -26,13 +26,13 @@ def uniq(alist):
     return [set.setdefault(e, e) for e in alist if e not in set]
 
 def usage(errmsg):
-    print """
+    print("""
     Error: %s
 
     Usage:
       lspisi PiSi_package.PiSi         (lists the content of package)
       lspisi dirs PiSi_package.PiSi    (lists directories in the package for the package developer)
-    """ % (errmsg)
+    """ % (errmsg))
 
     sys.exit(1)
 
@@ -47,14 +47,14 @@ def main():
             dirlist.append(os.path.dirname(file))
 
         for dir in uniq(dirlist):
-            print "<Path fileType=\"\">/%s</Path>" % dir
+            print("<Path fileType=\"\">/%s</Path>" % dir)
 
     elif not os.path.exists(sys.argv[1]):
-        print "File %s not found" % sys.argv[1]
+        print("File %s not found" % sys.argv[1])
 
     else:
         for file in show_info(sys.argv[1]):
-            print "/%s" % file
+            print("/%s" % file)
 
 if __name__ == "__main__":
     sys.exit(main())

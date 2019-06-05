@@ -14,7 +14,7 @@ import subprocess
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 # PiSi Modules
 import pisi.context as ctx
@@ -35,7 +35,7 @@ def getVariableForLibrary(library, variable):
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
         return_code = proc.wait()
-    except OSError, exception:
+    except OSError as exception:
         if exception.errno == 2:
             raise PkgconfigError(_("pkg-config is not installed on your system."))
     else:
@@ -54,7 +54,7 @@ def getLibraryVersion(library):
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
         return_code = proc.wait()
-    except OSError, exception:
+    except OSError as exception:
         if exception.errno == 2:
             raise PkgconfigError(_("pkg-config is not installed on your system."))
     else:
@@ -74,7 +74,7 @@ def getLibraryCFLAGS(library):
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
         return_code = proc.wait()
-    except OSError, exception:
+    except OSError as exception:
         if exception.errno == 2:
             raise PkgconfigError(_("pkg-config is not installed on your system."))
     else:
@@ -94,7 +94,7 @@ def getLibraryLIBADD(library):
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
         return_code = proc.wait()
-    except OSError, exception:
+    except OSError as exception:
         if exception.errno == 2:
             raise PkgconfigError(_("pkg-config is not installed on your system."))
     else:
@@ -113,7 +113,7 @@ def runManualCommand(*args):
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
         return_code = proc.wait()
-    except OSError, exception:
+    except OSError as exception:
         if exception.errno == 2:
             raise PkgconfigError(_("pkg-config is not installed on your system."))
     else:
@@ -131,7 +131,7 @@ def libraryExists(library):
         result = subprocess.call(["pkg-config",
                                    "--exists",
                                    "%s" % library])
-    except OSError, exception:
+    except OSError as exception:
         if exception.errno == 2:
             raise PkgconfigError(_("pkg-config is not installed on your system."))
     else:

@@ -21,7 +21,7 @@ import getopt
 def chroot_comar(image_dir):
     if os.fork() == 0:
         try:
-            os.makedirs(os.path.join(image_dir, "var/db"), 0700)
+            os.makedirs(os.path.join(image_dir, "var/db"), 0o700)
         except OSError:
             pass
         os.chroot(image_dir)
@@ -45,10 +45,10 @@ def chroot_comar(image_dir):
 
 # run command and terminate if something goes wrong
 def run(cmd, ignore_error=False):
-    print cmd
+    print(cmd)
     ret = os.system(cmd)
     if ret and not ignore_error:
-        print "%s returned %s" % (cmd, ret)
+        print("%s returned %s" % (cmd, ret))
         sys.exit(1)
 
 def create_sandbox(output_dir, repository):
@@ -66,11 +66,11 @@ def create_sandbox(output_dir, repository):
             run('cp -p "%s" "%s"' % (os.path.join(path, name), os.path.join(path2, name)))
 
         # Create character device
-        os.mknod("%s/dev/null" % output_dir, 0666 | stat.S_IFCHR, os.makedev(1, 3))
-        os.mknod("%s/dev/console" % output_dir, 0666 | stat.S_IFCHR, os.makedev(5, 1))
+        os.mknod("%s/dev/null" % output_dir, 0o666 | stat.S_IFCHR, os.makedev(1, 3))
+        os.mknod("%s/dev/console" % output_dir, 0o666 | stat.S_IFCHR, os.makedev(5, 1))
 
         # Create urandom character device
-        os.mknod("%s/dev/urandom" % output_dir, 0666 | stat.S_IFCHR, os.makedev(1, 9))
+        os.mknod("%s/dev/urandom" % output_dir, 0o666 | stat.S_IFCHR, os.makedev(1, 9))
 
         # run command in chroot
         def chrun(cmd):
@@ -85,7 +85,7 @@ def create_sandbox(output_dir, repository):
         chrun("/usr/bin/hav call baselayout User.Manager setUser 0 'Root' '/root' '/bin/bash' 'pardus' '' ")
 
         # Now it is 2011 release
-        file(os.path.join(output_dir, "etc/pardus-release"), "w").write("Pardus 2011\n")
+        open(os.path.join(output_dir, "etc/pardus-release"), "w").write("Pardus 2011\n")
 
     except KeyboardInterrupt:
         run('umount %s/proc' % output_dir, ignore_error=True)

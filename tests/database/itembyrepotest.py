@@ -10,7 +10,7 @@
 # Please read the COPYING file.
 #
 
-import testcase
+from . import testcase
 import pisi.db.itembyrepo
 
 class TestDB:

@@ -16,7 +16,7 @@ import gzip
 import gettext
 import datetime
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import piksemel
 
@@ -62,10 +62,10 @@ class PackageDB(lazydb.LazyDB):
         if not obsoletes or src_repo:
             return []
 
-        return map(lambda x: x.firstChild().data(), obsoletes.tags("Package"))
+        return [x.firstChild().data() for x in obsoletes.tags("Package")]
 
     def __generate_packages(self, doc):
-        return dict(map(lambda x: (x.getTagData("Name"), gzip.zlib.compress(x.toString())), doc.tags("Package")))
+        return dict([(x.getTagData("Name"), gzip.zlib.compress(x.toString().encode())) for x in doc.tags("Package")])
 
     def __generate_revdeps(self, doc):
         revdeps = {}
@@ -92,9 +92,9 @@ class PackageDB(lazydb.LazyDB):
         found = []
         for name in packages:
             xml = self.pdb.get_item(name)
-            if terms == filter(lambda term: re.compile(term, re.I).search(name) or \
+            if terms == [term for term in terms if re.compile(term, re.I).search(name) or \
                                             re.compile(resum % (lang, term), re.I).search(xml) or \
-                                            re.compile(redesc % (lang, term), re.I).search(xml), terms):
+                                            re.compile(redesc % (lang, term), re.I).search(xml)]:
                 found.append(name)
         return found
 
@@ -116,12 +116,12 @@ class PackageDB(lazydb.LazyDB):
             fields = {'name': True, 'summary': True, 'desc': True}
         found = []
         for name, xml in self.pdb.get_items_iter(repo):
-            if terms == filter(lambda term: (fields['name'] and \
+            if terms == [term for term in terms if (fields['name'] and \
                     re.compile(term, re.I).search(name)) or \
                     (fields['summary'] and \
-                    re.compile(resum % (lang, term), re.I).search(xml)) or \
+                    re.compile(resum % (lang, term), re.I).search(xml.decode())) or \
                     (fields['desc'] and \
-                    re.compile(redesc % (lang, term), re.I).search(xml)), terms):
+                    re.compile(redesc % (lang, term), re.I).search(xml.decode()))]:
                 found.append(name)
         return found
 
@@ -201,7 +201,7 @@ class PackageDB(lazydb.LazyDB):
 
         for pkg_name in self.rpdb.get_list_item():
             xml = self.pdb.get_item(pkg_name, repo)
-            package = piksemel.parseString(xml)
+            package = piksemel.parseString(xml.decode())
             replaces_tag = package.getTag("Replaces")
             if replaces_tag:
                 for node in replaces_tag.tags("Package"):

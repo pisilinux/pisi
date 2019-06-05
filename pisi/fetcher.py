@@ -23,7 +23,7 @@ import shutil
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 # pisi modules
 import pisi
@@ -166,7 +166,7 @@ class Fetcher:
                            reget        = self._test_range_support(),
                            copy_local   = 1,
                            user_agent   = 'PiSi Fetcher/' + pisi.__version__)
-        except urlgrabber.grabber.URLGrabError, e:
+        except urlgrabber.grabber.URLGrabError as e:
             raise FetchError(_('Could not fetch destination file "%s": %s') % (self.url.get_uri(), e))
 
         if os.stat(self.partial_file).st_size == 0:
@@ -220,17 +220,17 @@ class Fetcher:
         if not os.path.exists(self.partial_file):
             return None
 
-        import urllib2
+        import urllib.request, urllib.error, urllib.parse
         try:
-            file_obj = urllib2.urlopen(urllib2.Request(self.url.get_uri()))
-        except urllib2.URLError:
+            file_obj = urllib.request.urlopen(urllib.request.Request(self.url.get_uri()))
+        except urllib.error.URLError:
             ctx.ui.debug(_("Remote file can not be reached. Previously downloaded part of the file will be removed."))
             os.remove(self.partial_file)
             return None
 
         headers = file_obj.info()
         file_obj.close()
-        if headers.has_key('Content-Length'):
+        if 'Content-Length' in headers:
             return 'simple'
         else:
             ctx.ui.debug(_("Server doesn't support partial downloads. Previously downloaded part of the file will be over-written."))

@@ -14,25 +14,22 @@ import pisi
 import pisi.pxml.xmlfile as xmlfile
 import pisi.pxml.autoxml as autoxml
 
+
 class Error(pisi.Error):
     pass
 
-__metaclass__ = autoxml.autoxml
 
-class Group(xmlfile.XmlFile):
-    "representation for group declarations"
-
-    __metaclass__ = autoxml.autoxml
+class Group(xmlfile.XmlFile, metaclass=autoxml.autoxml):
+    """Representation for group declarations"""
 
     t_Name = [autoxml.String, autoxml.mandatory]
     t_LocalName = [autoxml.LocalText, autoxml.mandatory]
-    t_Icon = [ autoxml.String, autoxml.optional]
+    t_Icon = [autoxml.String, autoxml.optional]
 
-class Groups(xmlfile.XmlFile):
-    "representation for component declarations"
 
-    __metaclass__ = autoxml.autoxml
+class Groups(xmlfile.XmlFile, metaclass=autoxml.autoxml):
+    """Representation for component declarations"""
 
     tag = "PISI"
 
-    t_Groups = [ [Group], autoxml.optional, "Groups/Group" ]
+    t_Groups = [[Group], autoxml.optional, "Groups/Group"]

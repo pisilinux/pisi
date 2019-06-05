@@ -18,7 +18,7 @@
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 # standard python modules
 import os.path
@@ -39,9 +39,8 @@ import pisi.db
 class Error(pisi.Error):
     pass
 
-__metaclass__ = autoxml.autoxml
 
-class Packager:
+class Packager(metaclass=autoxml.autoxml):
 
     t_Name = [autoxml.Text, autoxml.mandatory]
     t_Email = [autoxml.String, autoxml.mandatory]
@@ -51,7 +50,7 @@ class Packager:
         return s
 
 
-class AdditionalFile:
+class AdditionalFile(metaclass=autoxml.autoxml):
 
     s_Filename = [autoxml.String, autoxml.mandatory]
     a_target = [autoxml.String, autoxml.mandatory]
@@ -65,12 +64,12 @@ class AdditionalFile:
             s += '(%s)' % self.permission
         return s
 
-class Type:
+class Type(metaclass=autoxml.autoxml):
 
     s_type = [autoxml.String, autoxml.mandatory]
     a_package = [autoxml.String, autoxml.optional]
 
-class Action:
+class Action(metaclass=autoxml.autoxml):
 
     # Valid actions:
     #
@@ -85,7 +84,7 @@ class Action:
     def __str__(self):
         return self.action
 
-class Patch:
+class Patch(metaclass=autoxml.autoxml):
 
     s_Filename = [autoxml.String, autoxml.mandatory]
     a_compressionType = [autoxml.String, autoxml.optional]
@@ -105,7 +104,7 @@ class Patch:
             s += ' level:' + self.level
         return s
 
-class Update:
+class Update(metaclass=autoxml.autoxml):
 
     a_release = [autoxml.String, autoxml.mandatory]
     # 'type' attribute is here to keep backward compatibility
@@ -126,7 +125,7 @@ class Update:
             s += ", type=" + self.type
         return s
 
-class Path:
+class Path(metaclass=autoxml.autoxml):
 
     s_Path = [autoxml.String, autoxml.mandatory]
     a_fileType =  [autoxml.String, autoxml.optional]
@@ -138,7 +137,7 @@ class Path:
         return s
 
 
-class ComarProvide:
+class ComarProvide(metaclass=autoxml.autoxml):
 
     s_om = [autoxml.String, autoxml.mandatory]
     a_script = [autoxml.String, autoxml.mandatory]
@@ -150,7 +149,7 @@ class ComarProvide:
         s += ' (' + self.om + '%s' % (' for %s' % self.name if self.name else '') + ')'
         return s
 
-class Archive:
+class Archive(metaclass=autoxml.autoxml):
 
     s_uri = [ autoxml.String, autoxml.mandatory ]
     a_type = [ autoxml.String, autoxml.optional ]
@@ -164,7 +163,7 @@ class Archive:
         s = _('URI: %s, type: %s, sha1sum: %s') % (self.uri, self.type, self.sha1sum)
         return s
 
-class Source:
+class Source(metaclass=autoxml.autoxml):
 
     t_Name = [autoxml.String, autoxml.mandatory]
     t_Homepage = [autoxml.String, autoxml.optional]
@@ -187,7 +186,7 @@ class Source:
     def buildtimeDependencies(self):
         return self.buildDependencies
 
-class AnyDependency:
+class AnyDependency(metaclass=autoxml.autoxml):
     t_Dependencies = [[pisi.dependency.Dependency], autoxml.optional, "Dependency"]
 
     def __str__(self):
@@ -223,7 +222,7 @@ class AnyDependency:
                 return True
         return False
 
-class Package:
+class Package(metaclass=autoxml.autoxml):
 
     t_Name = [ autoxml.String, autoxml.mandatory ]
     t_Summary = [ autoxml.LocalText, autoxml.optional ]
@@ -369,10 +368,10 @@ class Package:
     def __str__(self):
         s = _('Name: %s, version: %s, release: %s\n') \
                 % (self.name, self.version, self.release)
-        s += _('Summary: %s\n') % unicode(self.summary)
-        s += _('Description: %s\n') % unicode(self.description)
-        s += _('Licenses: %s\n') % u", ".join(self.license)
-        s += _('Component: %s\n') % unicode(self.partOf)
+        s += _('Summary: %s\n') % str(self.summary)
+        s += _('Description: %s\n') % str(self.description)
+        s += _('Licenses: %s\n') % ", ".join(self.license)
+        s += _('Component: %s\n') % str(self.partOf)
         s += _('Provides: ')
         for x in self.providesComar:
            s += x.om + ' '
@@ -387,8 +386,7 @@ class Package:
         return s + '\n'
 
 
-class SpecFile(xmlfile.XmlFile):
-    __metaclass__ = autoxml.autoxml #needed when we specify a superclass
+class SpecFile(xmlfile.XmlFile, metaclass=autoxml.autoxml):
 
     tag = "PISI"
 
@@ -407,7 +405,7 @@ class SpecFile(xmlfile.XmlFile):
             deps += sum([x.dependencies for x
                          in package.packageAnyDependencies], [])
             for dep in deps:
-                for attr_name, attr_value in dep.__dict__.items():
+                for attr_name, attr_value in list(dep.__dict__.items()):
                     if attr_value != "current":
                         continue
 
@@ -439,7 +437,7 @@ class SpecFile(xmlfile.XmlFile):
             return
         try:
             doc = piksemel.parse(path)
-        except Exception, e:
+        except Exception as e:
             raise Error(_("File '%s' has invalid XML") % (path) )
 
         if doc.getTag("Source").getTagData("Name") == self.source.name:
@@ -455,10 +453,10 @@ class SpecFile(xmlfile.XmlFile):
     def __str__(self):
         s = _('Name: %s, version: %s, release: %s\n') % (
               self.source.name, self.history[0].version, self.history[0].release)
-        s += _('Summary: %s\n') % unicode(self.source.summary)
-        s += _('Description: %s\n') % unicode(self.source.description)
-        s += _('Licenses: %s\n') % u", ".join(self.source.license)
-        s += _('Component: %s\n') % unicode(self.source.partOf)
+        s += _('Summary: %s\n') % str(self.source.summary)
+        s += _('Description: %s\n') % str(self.source.description)
+        s += _('Licenses: %s\n') % ", ".join(self.source.license)
+        s += _('Component: %s\n') % str(self.source.partOf)
         s += _('Build Dependencies: ')
         for x in self.source.buildDependencies:
            s += x.package + ' '

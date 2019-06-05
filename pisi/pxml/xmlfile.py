@@ -23,7 +23,7 @@
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import piksemel as iks
 
@@ -54,9 +54,9 @@ class XmlFile(object):
     def parsexml(self, xml):
         """parses xml string and returns DOM"""
         try:
-            self.doc = iks.parseString(xml)
+            self.doc = iks.parseString(xml.decode() if type(xml) == bytes else xml)
             return self.doc
-        except Exception, e:
+        except Exception as e:
             raise Error(_("String '%s' has invalid XML") % (xml))
 
     def readxml(self, uri, tmpDir='/tmp', sha1sum=False,
@@ -79,9 +79,9 @@ class XmlFile(object):
         try:
             self.doc = iks.parse(localpath)
             return self.doc
-        except OSError, e:
+        except OSError as e:
             raise Error(_("Unable to read file (%s): %s") %(localpath,e))
-        except Exception, e:
+        except Exception as e:
             raise Error(_("File '%s' has invalid XML") % (localpath) )
 
     def writexml(self, uri, tmpDir = '/tmp', sha1sum=False, compress=None, sign=None):

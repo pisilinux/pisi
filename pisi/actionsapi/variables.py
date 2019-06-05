@@ -28,7 +28,7 @@ def exportFlags():
     # Build systems depend on these environment variables. That is why
     # we export them instead of using as (instance) variables.
     values = ctx.config.values
-    os.environ['HOST'] =  values.build.host
+    os.environ['HOST'] = values.build.host
     os.environ['CFLAGS'] = values.build.cflags
     os.environ['CXXFLAGS'] = values.build.cxxflags
     os.environ['LDFLAGS'] = values.build.ldflags
@@ -39,6 +39,7 @@ def exportFlags():
     os.environ['CC'] = values.build.cc
     os.environ['CXX'] = values.build.cxx
     os.environ['LD'] = values.build.ld
+
 
 class Env(object):
     '''General environment variables used in actions API'''
@@ -65,7 +66,7 @@ class Env(object):
 
         # Using environment variables is somewhat tricky. Each time
         # you need them you need to check for their value.
-        if self.__vars.has_key(attr):
+        if attr in self.__vars:
             return os.getenv(self.__vars[attr])
         else:
             return None

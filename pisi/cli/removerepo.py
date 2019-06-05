@@ -12,19 +12,18 @@
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi.cli.command as command
 import pisi.api
 
-class RemoveRepo(command.Command):
+class RemoveRepo(command.Command, metaclass=command.autocommand):
     __doc__ = _("""Remove repositories
 
 Usage: remove-repo <repo1> <repo2> ... <repon>
 
 Remove all repository information from the system.
 """)
-    __metaclass__ = command.autocommand
 
     def __init__(self,args):
         super(RemoveRepo, self).__init__(args)

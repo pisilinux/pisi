@@ -19,7 +19,7 @@ import grp
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 # Pisi Modules
 import pisi.context as ctx
@@ -32,13 +32,16 @@ from pisi.actionsapi import error
 from pisi.util import run_logged
 from pisi.util import join_path
 
+
 def can_access_file(filePath):
     '''test the existence of file'''
     return os.access(filePath, os.F_OK)
 
+
 def can_access_directory(destinationDirectory):
     '''test readability, writability and executablility of directory'''
     return os.access(destinationDirectory, os.R_OK | os.W_OK | os.X_OK)
+
 
 def makedirs(destinationDirectory):
     '''recursive directory creation function'''
@@ -48,6 +51,7 @@ def makedirs(destinationDirectory):
     except OSError:
         error(_('Cannot create directory %s') % destinationDirectory)
 
+
 def echo(destionationFile, content):
     try:
         f = open(destionationFile, 'a')
@@ -56,7 +60,8 @@ def echo(destionationFile, content):
     except IOError:
         error(_('ActionsAPI [echo]: Can\'t append to file %s.') % (destionationFile))
 
-def chmod(filePath, mode = 0755):
+
+def chmod(filePath, mode=0o755):
     '''change the mode of filePath to the mode'''
     filePathGlob = glob.glob(filePath)
     if len(filePathGlob) == 0:
@@ -72,6 +77,7 @@ def chmod(filePath, mode = 0755):
         else:
             ctx.ui.error(_('ActionsAPI [chmod]: File %s doesn\'t exists.') % (fileName))
 
+
 def chown(filePath, uid = 'root', gid = 'root'):
     '''change the owner and group id of filePath to uid and gid'''
     if can_access_file(filePath):
@@ -83,12 +89,14 @@ def chown(filePath, uid = 'root', gid = 'root'):
     else:
         ctx.ui.error(_('ActionsAPI [chown]: File %s doesn\'t exists.') % filePath)
 
+
 def sym(source, destination):
     '''creates symbolic link'''
     try:
         os.symlink(source, destination)
     except OSError:
         ctx.ui.error(_('ActionsAPI [sym]: Permission denied: %s to %s') % (source, destination))
+
 
 def unlink(pattern):
     '''remove the file path'''
@@ -108,6 +116,7 @@ def unlink(pattern):
         else:
             ctx.ui.error(_('ActionsAPI [unlink]: File %s doesn\'t exists.') % (filePath))
 
+
 def unlinkDir(sourceDirectory):
     '''delete an entire directory tree'''
     if isDirectory(sourceDirectory) or isLink(sourceDirectory):
@@ -119,6 +128,7 @@ def unlinkDir(sourceDirectory):
         ctx.ui.warning(_('ActionsAPI [unlinkDir]: %s is not a directory, use \'unlink\' or \'remove\' to remove files.') % sourceDirectory)
     else:
         error(_('ActionsAPI [unlinkDir]: Directory %s doesn\'t exists.') % (sourceDirectory))
+
 
 def move(source, destination):
     '''recursively move a "source" file or directory to "destination"'''
@@ -134,6 +144,7 @@ def move(source, destination):
                 error(_('ActionsAPI [move]: Permission denied: %s to %s') % (filePath, destination))
         else:
             error(_('ActionsAPI [move]: File %s doesn\'t exists.') % (filePath))
+
 
 # FIXME: instead of passing a sym parameter, split copy and copytree into 4 different function
 def copy(source, destination, sym = True):
@@ -165,6 +176,7 @@ def copy(source, destination, sym = True):
         else:
             error(_('ActionsAPI [copy]: File %s does not exist.') % filePath)
 
+
 def copytree(source, destination, sym = True):
     '''recursively copy an entire directory tree rooted at source'''
     if isDirectory(source):
@@ -177,10 +189,11 @@ def copytree(source, destination, sym = True):
                 return
         try:
             shutil.copytree(source, destination, sym)
-        except OSError, e:
+        except OSError as e:
             error(_('ActionsAPI [copytree] %s to %s: %s') % (source, destination, e))
     else:
         error(_('ActionsAPI [copytree]: Directory %s doesn\'t exists.') % (source))
+
 
 def touch(filePath):
     '''changes the access time of the 'filePath', or creates it if it does not exist'''
@@ -199,6 +212,7 @@ def touch(filePath):
         except IOError:
             error(_('ActionsAPI [touch]: Permission denied: %s') % (filePath))
 
+
 def cd(directoryName = ''):
     '''change directory'''
     current = os.getcwd()
@@ -207,6 +221,7 @@ def cd(directoryName = ''):
     else:
         os.chdir(os.path.dirname(current))
 
+
 def ls(source):
     '''listdir'''
     if os.path.isdir(source):
@@ -214,37 +229,46 @@ def ls(source):
     else:
         return glob.glob(source)
 
+
 def export(key, value):
     '''export environ variable'''
     os.environ[key] = value
+
 
 def isLink(filePath):
     '''return True if filePath refers to a symbolic link'''
     return os.path.islink(filePath)
 
+
 def isFile(filePath):
     '''return True if filePath is an existing regular file'''
     return os.path.isfile(filePath)
+
 
 def isDirectory(filePath):
     '''Return True if filePath is an existing directory'''
     return os.path.isdir(filePath)
 
+
 def isEmpty(filePath):
     '''Return True if filePath is an empty file'''
     return os.path.getsize(filePath) == 0
+
 
 def realPath(filePath):
     '''return the canonical path of the specified filename, eliminating any symbolic links encountered in the path'''
     return os.path.realpath(filePath)
 
+
 def baseName(filePath):
     '''return the base name of pathname filePath'''
     return os.path.basename(filePath)
 
+
 def dirName(filePath):
     '''return the directory name of pathname path'''
     return os.path.dirname(filePath)
+
 
 def system(command):
     command = string.join(string.split(command))

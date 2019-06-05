@@ -77,7 +77,7 @@ class BuildPo(build):
 
         # Update PO files
         for item in glob.glob1("po", "*.po"):
-            print "Updating .. ", item
+            print("Updating .. ", item)
             os.system("msgmerge --update --no-wrap --sort-by-file po/%s po/%s.pot" % (item, PROJECT))
 
         # Cleanup
@@ -103,7 +103,7 @@ class Install(install):
             if not name.endswith('.po'):
                 continue
             lang = name[:-3]
-            print "Installing '%s' translations..." % lang
+            print("Installing '%s' translations..." % lang)
             os.popen("msgfmt po/%s.po -o po/%s.mo" % (lang, lang))
             if not self.root:
                 self.root = "/"
@@ -118,7 +118,7 @@ class Install(install):
             os.makedirs(destpath)
         os.chdir('doc')
         for pdf in glob.glob('*.pdf'):
-            print 'Installing', pdf
+            print('Installing', pdf)
             shutil.copy(pdf, os.path.join(destpath, pdf))
         os.chdir('..')
 
@@ -153,28 +153,27 @@ class Install(install):
             pisiconf.write('\n')
 
 
-
-setup(name="pisi",
-    version= pisi.__version__,
+setup(
+    name="pisi",
+    version=pisi.__version__,
     description="PiSi (Packages Installed Successfully as Intended)",
     long_description="PiSi is the package management system of Pardus Linux.",
     license="GNU GPL2",
     author="Pardus Developers",
     author_email="pisi@pardus.org.tr",
     url="http://www.pardus.org.tr/eng/pisi/",
-    package_dir = {'': ''},
-    packages = ['pisi', 'pisi.cli', 'pisi.operations', 'pisi.actionsapi', 'pisi.pxml', 'pisi.scenarioapi', 'pisi.db'],
-    scripts = ['pisi-cli', 'scripts/lspisi', 'scripts/unpisi', 'scripts/check-newconfigs.py', 'scripts/revdep-rebuild'],
-    cmdclass = {'build' : Build,
-                'build_po' : BuildPo,
-                'install' : Install}
-    )
+    package_dir={'': ''},
+    packages=['pisi', 'pisi.cli', 'pisi.operations', 'pisi.actionsapi', 'pisi.pxml', 'pisi.scenarioapi', 'pisi.db'],
+    scripts=['pisi-cli', 'scripts/lspisi', 'scripts/unpisi', 'scripts/check-newconfigs.py', 'scripts/revdep-rebuild'],
+    cmdclass={'build': Build, 'build_po': BuildPo, 'install': Install}
+)
 
 # the below stuff is really nice but we already have a version
 # we can use this stuff for svn snapshots in a separate
 # script, or with a parameter I don't know -- exa
 
 PISI_VERSION = pisi.__version__
+
 
 def getRevision():
     import os
@@ -189,6 +188,7 @@ def getRevision():
 
     # doesn't working in a Subversion directory
     return None
+
 
 def getVersion():
     rev = getRevision()

@@ -16,7 +16,7 @@ import zipfile
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 import pisi.context as ctx
@@ -41,7 +41,7 @@ def install_pkg_names(A, reinstall = False):
 
     # filter packages that are already installed
     if not reinstall:
-        Ap = set(filter(lambda x: not installdb.has_package(x), A))
+        Ap = set([x for x in A if not installdb.has_package(x)])
         d = A - Ap
         if len(d) > 0:
             ctx.ui.warning(_("The following package(s) are already installed "
@@ -159,7 +159,7 @@ def install_pkg_files(package_URIs, reinstall = False):
 
     # check packages' DistributionReleases and Architecture
     if not ctx.get_option('ignore_check'):
-        for x in d_t.keys():
+        for x in list(d_t.keys()):
             pkg = d_t[x]
             if pkg.distributionRelease != ctx.config.values.general.distribution_release:
                 raise pisi.Error(_('Package %s is not compatible with your distribution release %s %s.') \
@@ -178,7 +178,7 @@ def install_pkg_files(package_URIs, reinstall = False):
     # that aren't already satisfied and try to install them
     # from the repository
     dep_unsatis = []
-    for name in d_t.keys():
+    for name in list(d_t.keys()):
         pkg = d_t[name]
         deps = pkg.runtimeDependencies()
         for dep in deps:
@@ -207,7 +207,7 @@ def install_pkg_files(package_URIs, reinstall = False):
 
     packagedb = PackageDB()
 
-    A = d_t.keys()
+    A = list(d_t.keys())
 
     if len(A)==0:
         ctx.ui.info(_('No packages to install.'))

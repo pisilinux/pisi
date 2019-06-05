@@ -175,11 +175,11 @@ temp_translation = '''<?xml version="1.0" ?>
 
 def write(filename, data):
     try:
-       f = file("%s/%s" % (target, filename), "w")
+       f = open("%s/%s" % (target, filename), "w")
        f.write(data)
        f.close()
     except:
-        print "Could not write file %s/%s" % (target, filename)
+        print("Could not write file %s/%s" % (target, filename))
 
 
 def create_dirs():
@@ -187,7 +187,7 @@ def create_dirs():
         os.makedirs("%s/files" % target)
         os.makedirs("%s/comar" % target)
     except:
-        print "Could not make directory %s" % target
+        print("Could not make directory %s" % target)
         sys.exit(1)
 
 def readConfig():
@@ -196,7 +196,7 @@ def readConfig():
     d = {"name": "", "email": ""}
 
     if home != "" and os.path.exists(cfg):
-        for line in file(cfg):
+        for line in open(cfg):
             if line != "" and not line.startswith("#") and "=" in line:
                 l, m = line.split("=", 1)
                 k = l.strip()
@@ -210,7 +210,7 @@ def readConfig():
 
 # some checks
 if len(sys.argv) < 2:
-    print "Usage : %s NewPackageDir" % sys.argv[0]
+    print("Usage : %s NewPackageDir" % sys.argv[0])
     sys.exit(0)
 else:
     target = sys.argv[1]
@@ -218,10 +218,10 @@ else:
     data["package_cap"] = string.capitalize(data["package"])
 
 if os.path.exists(target):
-    print "%s already exists, please remove it first" % target
+    print("%s already exists, please remove it first" % target)
     sys.exit(1)
 elif " " in data["package"]:
-    print "You should not use empty space in package name"
+    print("You should not use empty space in package name")
     sys.exit(1)
 
 # here we go

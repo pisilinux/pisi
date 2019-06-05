@@ -22,7 +22,7 @@ import shutil
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.ugettext
+_ = __trans.gettext
 
 import pisi
 import pisi.uri
@@ -57,8 +57,8 @@ class File:
     COMPRESSION_TYPE_BZ2 = 1
     COMPRESSION_TYPE_XZ = 2
 
-    (read, write) = range(2)            # modes
-    (detached, whatelse) = range(2)
+    (read, write) = list(range(2))            # modes
+    (detached, whatelse) = list(range(2))
 
     __compressed_file_extensions = {".xz": COMPRESSION_TYPE_XZ,
                                     ".bz2": COMPRESSION_TYPE_BZ2}
@@ -66,7 +66,7 @@ class File:
     @staticmethod
     def make_uri(uri):
         "handle URI arg"
-        if isinstance(uri, basestring):
+        if isinstance(uri, str):
             uri = pisi.uri.URI(uri)
         elif not isinstance(uri, pisi.uri.URI):
             raise Error(_("uri must have type either URI or string"))
@@ -75,7 +75,7 @@ class File:
     @staticmethod
     def choose_method(filename, compress):
         if compress == File.COMPRESSION_TYPE_AUTO:
-            for ext, method in File.__compressed_file_extensions.items():
+            for ext, method in list(File.__compressed_file_extensions.items()):
                 if filename.endswith(ext):
                     return method
 
@@ -92,7 +92,7 @@ class File:
         compress = File.choose_method(localfile, compress)
         if compress == File.COMPRESSION_TYPE_XZ:
             import lzma
-            open(localfile[:-3], "w").write(lzma.LZMAFile(localfile).read())
+            open(localfile[:-3], "wb").write(lzma.LZMAFile(localfile).read())
             localfile = localfile[:-3]
         elif compress == File.COMPRESSION_TYPE_BZ2:
             import bz2
@@ -115,7 +115,7 @@ class File:
 
         if sha1sum:
             sha1filename = File.download(pisi.uri.URI(uri.get_uri() + '.sha1sum'), transfer_dir)
-            sha1f = file(sha1filename)
+            sha1f = open(sha1filename)
             newsha1 = sha1f.read().split("\n")[0]
 
         if uri.is_remote_file() or copylocal:
@@ -125,7 +125,7 @@ class File:
             # TODO: code to use old .sha1sum file, is this a necessary optimization?
             #oldsha1fn = localfile + '.sha1sum'
             #if os.exists(oldsha1fn):
-                #oldsha1 = file(oldsha1fn).readlines()[0]
+                #oldsha1 = open(oldsha1fn).readlines()[0]
             if sha1sum and os.path.exists(origfile):
                 oldsha1 = pisi.util.sha1_file(origfile)
                 if (newsha1 == oldsha1):
@@ -202,7 +202,7 @@ class File:
             access = 'r'
         else:
             access = 'w'
-        self.__file__ = file(localfile, access)
+        self.__file__ = open(localfile, access)
         self.localfile = localfile
 
     def local_file(self):
@@ -233,12 +233,12 @@ class File:
 
             if self.sha1sum:
                 sha1 = pisi.util.sha1_file(self.localfile)
-                cs = file(self.localfile + '.sha1sum', 'w')
+                cs = open(self.localfile + '.sha1sum', 'w')
                 cs.write(sha1)
                 cs.close()
                 for compressed_file in compressed_files:
                     sha1 = pisi.util.sha1_file(compressed_file)
-                    cs = file(compressed_file + '.sha1sum', 'w')
+                    cs = open(compressed_file + '.sha1sum', 'w')
                     cs.write(sha1)
                     cs.close()
 
@@ -256,7 +256,7 @@ class File:
                 sigfilename = File.download(pisi.uri.URI(uri + '.sig'), transfer_dir)
             except KeyboardInterrupt:
                 raise
-            except Exception, e: #FIXME: what exception could we catch here, replace with that.
+            except Exception as e: #FIXME: what exception could we catch here, replace with that.
                 raise NoSignatureFound(uri)
             if os.system('gpg --verify ' + sigfilename) != 0:
                 raise InvalidSignature(uri)
@@ -271,8 +271,8 @@ class File:
     def isatty(self):
         return self.__file__.isatty()
 
-    def next(self):
-        return self.__file__.next()
+    def __next__(self):
+        return next(self.__file__)
 
     def read(self, size = None):
         if size:
@@ -293,7 +293,7 @@ class File:
             return self.__file__.readlines()
 
     def xreadlines(self):
-        return self.__file__.xreadlines()
+        return self.__file__
 
     def seek(self, offset, whence=0):
         self.__file__.seek(offset, whence)

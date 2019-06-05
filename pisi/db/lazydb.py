@@ -11,14 +11,14 @@
 #
 
 import os
-import cPickle
+import pickle
 import time
 import pisi.context as ctx
 import pisi.util as util
 
 import string
 # lower borks for international locales. What we want is ascii lower.
-lower_map = string.maketrans(string.ascii_uppercase, string.ascii_lowercase)
+lower_map = str.maketrans(string.ascii_uppercase, string.ascii_lowercase)
 
 class Singleton(object):
     _the_instances = {}
@@ -39,7 +39,7 @@ class LazyDB(Singleton):
     cache_version = "2.4"
 
     def __init__(self, cacheable=False, cachedir=None):
-        if not self.__dict__.has_key("initialized"):
+        if "initialized" not in self.__dict__:
             self.initialized = False
         self.cacheable = cacheable
         self.cachedir = cachedir
@@ -65,8 +65,8 @@ class LazyDB(Singleton):
                 f.write(LazyDB.cache_version)
                 f.flush()
                 os.fsync(f.fileno())
-            cPickle.dump(self._instance().__dict__,
-                         file(self.__cache_file(), 'wb'), 1)
+            pickle.dump(self._instance().__dict__,
+                         open(self.__cache_file(), 'wb'), 1)
 
     def cache_valid(self):
         if not self.cachedir:
@@ -83,9 +83,9 @@ class LazyDB(Singleton):
     def cache_load(self):
         if os.path.exists(self.__cache_file()) and self.cache_valid():
             try:
-                self._instance().__dict__ = cPickle.load(file(self.__cache_file(), 'rb'))
+                self._instance().__dict__ = pickle.load(open(self.__cache_file(), 'rb'), encoding='utf8', errors='ignore')
                 return True
-            except (cPickle.UnpicklingError, EOFError):
+            except (pickle.UnpicklingError, EOFError):
                 if os.access(ctx.config.cache_root_dir(), os.W_OK):
                     os.unlink(self.__cache_file())
                 return False
@@ -116,7 +116,7 @@ class LazyDB(Singleton):
             ctx.ui.debug("%s initialized in %s." % (self.__class__.__name__, end - start))
             self.initialized = True
 
-        if not self.__dict__.has_key(attr):
-            raise AttributeError, attr
+        if attr not in self.__dict__:
+            raise AttributeError(attr)
 
         return self.__dict__[attr]
