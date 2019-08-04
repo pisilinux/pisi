@@ -127,7 +127,7 @@ class TarFile(tarfile.TarFile):
         else:
             options = {"format":    compressformat,
                        "level":     compresslevel}
-            fileobj = lzma.LZMAFile(name, mode, format=1, preset=compresslevel)
+            fileobj = lzma.LZMAFile(name, mode, format=1)
 
         try:
             t = cls.taropen(name, mode, fileobj, **kwargs)
