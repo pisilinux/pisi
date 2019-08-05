@@ -409,6 +409,7 @@ class Builder:
             env["CXX"] = "%s -m32" % os.getenv("CXX")
             env["CFLAGS"] = os.getenv("CFLAGS").replace("-fPIC", "")
             env["CXXFLAGS"] = os.getenv("CXXFLAGS").replace("-fPIC", "")
+            env["PKG_CONFIG_PATH"] = "/usr/lib32/pkgconfig"
         os.environ.update(env)
 
         # First check icecream, if not found use ccache

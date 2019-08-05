@@ -75,10 +75,12 @@ def configure(parameters = ''):
                 --sysconfdir=/%s \
                 --localstatedir=/%s \
                 --libexecdir=/%s \
-                %s' % (prefix, \
-                       get.HOST(), get.manDIR(), \
-                       get.infoDIR(), get.dataDIR(), \
-                       get.confDIR(), get.localstateDIR(), get.libexecDIR(), parameters)
+                %s%s' % (prefix, \
+                         get.HOST(), get.manDIR(), \
+                         get.infoDIR(), get.dataDIR(), \
+                         get.confDIR(), get.localstateDIR(), get.libexecDIR(),
+                         "--libdir=/usr/lib32 " if get.buildTYPE() == "emul32" else "",
+                         parameters)
 
         if get.buildTYPE() == "emul32":
             args += " --libdir=/usr/lib32"
