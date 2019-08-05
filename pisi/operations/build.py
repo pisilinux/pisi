@@ -706,7 +706,8 @@ class Builder:
 
         if func in self.actionLocals:
             if ctx.get_option('ignore_sandbox') or \
-                    not ctx.config.values.build.enablesandbox:
+                    not ctx.config.values.build.enablesandbox or \
+                    "emul32" in self.build_type:
                 self.actionLocals[func]()
             else:
                 import catbox
