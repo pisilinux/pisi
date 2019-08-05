@@ -407,6 +407,8 @@ class Builder:
         if self.build_type == "emul32":
             env["CC"] = "%s -m32" % os.getenv("CC")
             env["CXX"] = "%s -m32" % os.getenv("CXX")
+            env["CFLAGS"] = os.getenv("CFLAGS").replace("-fPIC", "")
+            env["CXXFLAGS"] = os.getenv("CXXFLAGS").replace("-fPIC", "")
         os.environ.update(env)
 
         # First check icecream, if not found use ccache
