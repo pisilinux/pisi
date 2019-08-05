@@ -516,6 +516,17 @@ def uncompress(patchFile, compressType="gz", targetDir=""):
     return filePath.split(".%s" % extension)[0]
 
 
+def check_patch_level(workdir, path):
+    level = 0
+    while path:
+        if os.path.isfile("%s/%s" % (workdir, path)):
+            return level
+        if path.find("/") == -1:
+            return None
+        level += 1
+        path = path[path.find("/")+1:]
+
+
 def do_patch(sourceDir, patchFile, level=0, name=None, reverse=False):
     """Apply given patch to the sourceDir."""
     cwd = os.getcwd()
@@ -524,13 +535,41 @@ def do_patch(sourceDir, patchFile, level=0, name=None, reverse=False):
     else:
         raise Error(_("ERROR: WorkDir (%s) does not exist\n") % (sourceDir))
 
-    if level == None:
+    check_file(patchFile)
+
+    if level is None:
+        with open(patchFile, "r") as patchfile:
+            lines = patchfile.readlines()
+            try:
+                paths_m = [l.strip().split()[1] for l in lines if l.startswith("---") and "/" in l]
+                try:
+                    paths_p = [l.strip().split()[1] for l in lines if l.startswith("+++")]
+                except IndexError:
+                    paths_p = []
+            except IndexError:
+                pass
+            else:
+                if not paths_p:
+                    paths_p = paths_m[:]
+                    try:
+                        paths_m = [l.strip().split()[1] for l in lines if l.startswith("***") and "/" in l]
+                    except IndexError:
+                        pass
+
+                for path_p, path_m in zip(paths_p, paths_m):
+                    if "/dev/null" in path_m and not len(paths_p) -1 == paths_p.index(path_p): continue
+                    level = check_patch_level(sourceDir, path_p)
+                    if level is None and len(paths_m) - 1 == paths_m.index(path_m):
+                        level = check_patch_level(sourceDir, path_m)
+                    if level is not None:
+                        ctx.ui.debug("Detected patch level=%s for %s" % (level, os.path.basename(patchFile)))
+                        break
+
+    if level is None:
         level = 0
 
     if name is None:
         name = os.path.basename(patchFile)
-
-    check_file(patchFile)
 
     if ctx.get_option('use_quilt'):
         patchesDir = join_path(sourceDir, ctx.const.quilt_dir_suffix)
