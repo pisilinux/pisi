@@ -682,6 +682,10 @@ class Builder:
                 src_dir, ext = os.path.splitext(src_dir)
                 if not ext:
                     break
+            if not os.path.exists(src_dir):
+                src_dir = util.join_path(self.pkg_work_dir(), [d for d in os.walk(self.pkg_work_dir()).next()[1] if not d.startswith(".")][0])
+                if self.get_state() == "unpack":
+                    ctx.ui.debug("Using %s as WorkDir" % src_dir)
 
         return src_dir
 
