@@ -403,6 +403,10 @@ class Builder:
                "SRC_NAME": self.spec.source.name,
                "SRC_VERSION": self.spec.getSourceVersion(),
                "SRC_RELEASE": self.spec.getSourceRelease()}
+
+        if self.build_type == "emul32":
+            env["CC"] = "%s -m32" % os.getenv("CC")
+            env["CXX"] = "%s -m32" % os.getenv("CXX")
         os.environ.update(env)
 
         # First check icecream, if not found use ccache
