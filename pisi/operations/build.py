@@ -403,6 +403,13 @@ class Builder:
                "SRC_NAME": self.spec.source.name,
                "SRC_VERSION": self.spec.getSourceVersion(),
                "SRC_RELEASE": self.spec.getSourceRelease()}
+
+        if self.build_type == "emul32":
+            env["CC"] = "%s -m32" % os.getenv("CC")
+            env["CXX"] = "%s -m32" % os.getenv("CXX")
+            env["CFLAGS"] = os.getenv("CFLAGS").replace("-fPIC", "")
+            env["CXXFLAGS"] = os.getenv("CXXFLAGS").replace("-fPIC", "")
+            env["PKG_CONFIG_PATH"] = "/usr/lib32/pkgconfig"
         os.environ.update(env)
 
         # First check icecream, if not found use ccache
@@ -676,6 +683,10 @@ class Builder:
                 src_dir, ext = os.path.splitext(src_dir)
                 if not ext:
                     break
+            if not os.path.exists(src_dir):
+                src_dir = util.join_path(self.pkg_work_dir(), [d for d in os.walk(self.pkg_work_dir()).next()[1] if not d.startswith(".")][0])
+                if self.get_state() == "unpack":
+                    ctx.ui.debug("Using %s as WorkDir" % src_dir)
 
         return src_dir
 
@@ -700,7 +711,8 @@ class Builder:
 
         if func in self.actionLocals:
             if ctx.get_option('ignore_sandbox') or \
-                    not ctx.config.values.build.enablesandbox:
+                    not ctx.config.values.build.enablesandbox or \
+                    "emul32" in self.build_type:
                 self.actionLocals[func]()
             else:
                 import catbox
