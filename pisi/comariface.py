@@ -36,8 +36,9 @@ def is_char_valid(char):
 
 def is_method_missing(exception):
     """Tells if exception is about missing method in COMAR script"""
-    if exception._dbus_error_name in ("tr.org.pardus.comar.python.missing",
-                                      "tr.org.pardus.comar.Missing"):
+    if exception.get_dbus_name() in ("tr.org.pardus.comar.python.missing", "tr.org.pardus.comar.Missing"):
+        return True
+    if exception.__context__.get_dbus_name() in ("tr.org.pardus.comar.python.missing", "tr.org.pardus.comar.Missing"):
         return True
     return False
 
