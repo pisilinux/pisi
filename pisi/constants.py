@@ -95,6 +95,7 @@ class Constants(metaclass=Singleton):
         self.__c.needs_reboot = "needsreboot"
         self.__c.files_db = "files.db"
         self.__c.repos = "repos"
+        self.__c.installed_extra = "installedextra"
 
         #file/directory permissions
         self.__c.umask = 0o022
