@@ -67,6 +67,15 @@ class InstallDB(lazydb.LazyDB):
     def init(self):
         self.installed_db = self.__generate_installed_pkgs()
         self.rev_deps_db = self.__generate_revdeps()
+        self.installed_extra = self.__generate_installed_extra()
+
+    def __generate_installed_extra(self):
+        ie = []
+        ie_path = os.path.join(ctx.config.info_dir(), ctx.const.installed_extra)
+        if os.path.isfile(ie_path):
+             with open(ie_path) as ie_file:
+                 ie.extend(ie_file.read().strip().split("\n"))
+        return ie
 
     def __generate_installed_pkgs(self):
         def split_name(dirname):
@@ -248,6 +257,19 @@ class InstallDB(lazydb.LazyDB):
                 rev_deps.append((pkg, dependency))
 
         return rev_deps
+
+    def get_orphaned(self):
+        """
+        get list of packages installed as extra dependency,
+        but without reverse dependencies now.
+        """
+        return [x for x in self.installed_extra if not self.get_rev_deps(x)]
+
+    def get_no_rev_deps(self):
+        """
+        get installed packages list which haven't reverse dependencies.
+        """
+        return [x for x in self.installed_db if not self.get_rev_deps(x)]
 
     def pkg_dir(self, pkg, version, release):
         return pisi.util.join_path(ctx.config.packages_dir(), pkg + '-' + version + '-' + release)

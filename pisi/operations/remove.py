@@ -10,19 +10,20 @@
 # Please read the COPYING file.
 #
 
+import gettext
 import sys
 
-import gettext
+import pisi
+import pisi.atomicoperations as atomicoperations
+import pisi.context as ctx
+import pisi.db
+import pisi.pgraph as pgraph
+import pisi.ui as ui
+import pisi.util as util
+
 __trans = gettext.translation('pisi', fallback=True)
 _ = __trans.gettext
 
-import pisi
-import pisi.context as ctx
-import pisi.atomicoperations as atomicoperations
-import pisi.pgraph as pgraph
-import pisi.util as util
-import pisi.ui as ui
-import pisi.db
 
 def remove(A, ignore_dep = False, ignore_safety = False):
     """remove set A of packages from system (A is a list of package names)"""
@@ -81,6 +82,10 @@ in the respective order to satisfy dependencies:
     for x in order:
         if installdb.has_package(x):
             atomicoperations.remove_single(x)
+            if x in installdb.installed_extra:
+                installdb.installed_extra.remove(x)
+                with open(os.path.join(ctx.config.info_dir(), ctx.const.installed_extra), "w") as ie_file:
+                    ie_file.write("\n".join(installdb.installed_extra) + ("\n" if installdb.installed_extra else ""))
         else:
             ctx.ui.info(_('Package %s is not installed. Cannot remove.') % x)
 
