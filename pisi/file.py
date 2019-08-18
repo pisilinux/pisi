@@ -219,10 +219,9 @@ class File:
                 import lzma
                 compressed_file = self.localfile + ".xz"
                 compressed_files.append(compressed_file)
-                options = {"level": 9}
-                lzma_file = lzma.LZMAFile(compressed_file, "w",
-                                          options=options)
-                lzma_file.write(open(self.localfile, "r").read())
+                # options = {"level": 9}
+                lzma_file = lzma.LZMAFile(compressed_file, "w", format=1)
+                lzma_file.write(open(self.localfile, "r").read().encode('utf-8'))
                 lzma_file.close()
 
             if ctypes & File.COMPRESSION_TYPE_BZ2:
