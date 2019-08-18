@@ -221,14 +221,14 @@ class File:
                 compressed_files.append(compressed_file)
                 # options = {"level": 9}
                 lzma_file = lzma.LZMAFile(compressed_file, "w", format=1)
-                lzma_file.write(open(self.localfile, "r").read().encode('utf-8'))
+                lzma_file.write(open(self.localfile, "r").read().encode())
                 lzma_file.close()
 
             if ctypes & File.COMPRESSION_TYPE_BZ2:
                 import bz2
                 compressed_file = self.localfile + ".bz2"
                 compressed_files.append(compressed_file)
-                bz2.BZ2File(compressed_file, "w").write(open(self.localfile, "r").read())
+                bz2.BZ2File(compressed_file, "w").write(open(self.localfile, "r").read().encode())
 
             if self.sha1sum:
                 sha1 = pisi.util.sha1_file(self.localfile)
