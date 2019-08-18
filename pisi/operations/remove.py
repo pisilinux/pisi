@@ -12,6 +12,7 @@
 
 import gettext
 import sys
+import os
 
 import pisi
 import pisi.atomicoperations as atomicoperations
