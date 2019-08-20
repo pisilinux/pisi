@@ -32,7 +32,6 @@ import pisi
 import pisi.util as util
 import pisi.context as ctx
 import pisi.uri
-import pisi.request
 
 
 class FetchError(pisi.Error):
