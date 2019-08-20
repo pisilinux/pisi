@@ -9,17 +9,17 @@
 #
 # Please read the COPYING file.
 #
-
-import os
-import optparse
-
 import gettext
+import optparse
+import os
+
+import pisi.api
+import pisi.cli.command as command
+import pisi.context as ctx
+
 __trans = gettext.translation('pisi', fallback=True)
 _ = __trans.gettext
 
-import pisi.cli.command as command
-import pisi.context as ctx
-import pisi.api
 
 class Fetch(command.Command, metaclass=command.autocommand):
     __doc__ = _("""Fetch a package
@@ -44,12 +44,22 @@ Downloads the given pisi packages to working directory
     def add_options(self, group):
         group.add_option("-o", "--output-dir", action="store", default=os.path.curdir,
                                help=_("Output directory for the fetched packages"))
+        group.add_option("--runtime-deps", action="store_true", default=None,
+                         help=_("Fetch runtime dependencies too"))
 
     def run(self):
-        self.init(database = False, write = False)
+        packages = pisi.db.packagedb.PackageDB()
+        self.init(database=False, write=False)
 
         if not self.args:
             self.help()
             return
 
-        pisi.api.fetch(self.args, ctx.config.options.output_dir)
+        runtime_dependencies = []
+
+        if ctx.config.options.runtime_deps:
+            for arg in self.args:
+                package = packages.get_package(arg)
+                runtime_dependencies = [dep.name() for dep in package.runtimeDependencies()]
+
+        pisi.api.fetch(self.args + runtime_dependencies, ctx.config.options.output_dir)

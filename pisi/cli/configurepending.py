@@ -19,6 +19,7 @@ _ = __trans.gettext
 import pisi.api
 import pisi.cli.command as command
 
+
 class ConfigurePending(command.PackageOp, metaclass=command.autocommand):
     __doc__ = _("""Configure pending packages
 
