@@ -170,7 +170,6 @@ class CLI(pisi.ui.UI):
             if no_expr.search(s):
                 return False
 
-
     def display_progress(self, **ka):
         """ display progress of any operation """
         if ka['operation'] in ["removing", "rebuilding-db"]:

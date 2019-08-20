@@ -64,6 +64,8 @@ class FetchHandler:
         self.size = blocknum * bs + self.exist_size
         if self.total_size:
             self.percent = self.size * 100 / self.total_size
+            if self.percent > 100:
+                self.percent = 100
         else:
             self.percent = 0
 
