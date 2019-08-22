@@ -1004,7 +1004,10 @@ class Builder:
         for root, dirs, files in os.walk(install_dir):
             for fn in files:
                 filepath = util.join_path(root, fn)
-                fileinfo = ms.from_file(filepath)
+                if os.path.exists(filepath):
+                    fileinfo = ms.from_file(filepath)
+                else:
+                    fileinfo = ''
                 strip_debug_action(filepath, fileinfo, install_dir, self.actionGlobals)
                 exclude_special_files(filepath, fileinfo, self.actionGlobals)
 
