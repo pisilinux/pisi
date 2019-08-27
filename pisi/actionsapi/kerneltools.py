@@ -187,12 +187,12 @@ def install():
 def installHeaders(extraHeaders=None):
     """ Install the files needed to build out-of-tree kernel modules. """
 
-    extras = ["drivers/media/dvb/dvb-core",
-              "drivers/media/dvb/frontends",
-              "drivers/media/video"]
+    #extras = ["drivers/media/dvb/dvb-core",
+    #          "drivers/media/dvb/frontends",
+    #          "drivers/media/video"]
 
-    if extraHeaders:
-        extras.extend(extraHeaders)
+    #if extraHeaders:
+    #    extras.extend(extraHeaders)
 
     pruned = ["include", "scripts", "Documentation"]
     wanted = ["Makefile*", "Kconfig*", "Kbuild*", "*.sh", "*.pl", "*.lds"]
@@ -214,8 +214,8 @@ def installHeaders(extraHeaders=None):
     shelltools.system(find_cmd)
 
     # Install additional headers
-    for headers in extras:
-        shelltools.system("cp -a %s/*.h %s/%s" % (headers, destination, headers))
+    #for headers in extras:
+    #    shelltools.system("cp -a %s/*.h %s/%s" % (headers, destination, headers))
 
     # Install remaining headers
     shelltools.system("cp -a %s %s" % (" ".join(pruned), destination))
