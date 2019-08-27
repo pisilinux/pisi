@@ -14,7 +14,7 @@ import subprocess
 
 import gettext
 __trans = gettext.translation('pisi', fallback=True)
-_ = __trans.gettext
+_ = __trans.ugettext
 
 # PiSi Modules
 import pisi.context as ctx
@@ -136,3 +136,4 @@ def libraryExists(library):
             raise PkgconfigError(_("pkg-config is not installed on your system."))
     else:
         return result == 0
+
