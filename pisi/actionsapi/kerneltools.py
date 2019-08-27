@@ -255,6 +255,17 @@ def installLibcHeaders(excludes=None):
     shelltools.makedirs(headers_tmp)
     shelltools.makedirs(headers_dir)
 
+     ###################Workaround begins here ...
+    #Workaround information -- http://patches.openembedded.org/patch/33433/
+    cpy_src="%s/linux-*/arch/x86/include/generated" % (get.workDIR())
+    cpy_tgt="%s/arch/x86/include" % (headers_tmp)
+    shelltools.makedirs(cpy_tgt)
+
+    copy_cmd ="cp -Rv %s %s " % (cpy_src, cpy_tgt)
+
+    shelltools.system(copy_cmd)
+    #######################Workaround ends here ...
+
     # make defconfig and install the headers
     autotools.make("%s defconfig" % make_cmd)
     autotools.rawInstall(make_cmd, "headers_install")
