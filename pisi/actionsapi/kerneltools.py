@@ -187,12 +187,12 @@ def install():
 def installHeaders(extraHeaders=None):
     """ Install the files needed to build out-of-tree kernel modules. """
 
-    extras = ["drivers/media/dvb/dvb-core",
-              "drivers/media/dvb/frontends",
-              "drivers/media/video"]
+    #extras = ["drivers/media/dvb/dvb-core",
+    #          "drivers/media/dvb/frontends",
+    #          "drivers/media/video"]
 
-    if extraHeaders:
-        extras.extend(extraHeaders)
+    #if extraHeaders:
+    #    extras.extend(extraHeaders)
 
     pruned = ["include", "scripts", "Documentation"]
     wanted = ["Makefile*", "Kconfig*", "Kbuild*", "*.sh", "*.pl", "*.lds"]
@@ -214,8 +214,8 @@ def installHeaders(extraHeaders=None):
     shelltools.system(find_cmd)
 
     # Install additional headers
-    for headers in extras:
-        shelltools.system("cp -a %s/*.h %s/%s" % (headers, destination, headers))
+    #for headers in extras:
+    #    shelltools.system("cp -a %s/*.h %s/%s" % (headers, destination, headers))
 
     # Install remaining headers
     shelltools.system("cp -a %s %s" % (" ".join(pruned), destination))
@@ -254,6 +254,17 @@ def installLibcHeaders(excludes=None):
     # Create directories
     shelltools.makedirs(headers_tmp)
     shelltools.makedirs(headers_dir)
+
+     ###################Workaround begins here ...
+    #Workaround information -- http://patches.openembedded.org/patch/33433/
+    cpy_src="%s/linux-*/arch/x86/include/generated" % (get.workDIR())
+    cpy_tgt="%s/arch/x86/include" % (headers_tmp)
+    shelltools.makedirs(cpy_tgt)
+
+    copy_cmd ="cp -Rv %s %s " % (cpy_src, cpy_tgt)
+
+    shelltools.system(copy_cmd)
+    #######################Workaround ends here ...
 
     # make defconfig and install the headers
     autotools.make("%s defconfig" % make_cmd)
