@@ -1200,6 +1200,16 @@ class Builder:
                 path = util.join_path(package_dir, filename)
                 if os.path.exists(path):
                     return path
+                else:
+                    name, version = util.parse_package_name(filename)
+                    if name.split("-").pop() in ["devel", "32bit", "doc", "docs", "userspace"]:
+                        name = name[:-1 - len(name.split("-").pop())]
+                    path = os.path.join(package_dir,
+                                        name[0:4].lower() if name.startswith("lib") and len(name) > 3 else name.lower()[0],
+                                        name.lower(),
+                                        filename)
+                    if os.path.exists(path):
+                        return path
 
         old_packages = {}
 

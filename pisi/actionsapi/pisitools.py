@@ -205,8 +205,8 @@ def dosed(sourceFiles, findPattern, replacePattern = ''):
     for sourceFile in sourceFilesGlob:
         if can_access_file(sourceFile):
             backupFile = "%s%s" % (sourceFile, backupExtension)
-            for line in fileinput.input(sourceFile, inplace = 1, backup = backupExtension):
-                #FIXME: In-place filtering is disabled when standard input is read
+            for line in fileinput.input(sourceFile, inplace=1, backup=backupExtension):
+                # FIXME: In-place filtering is disabled when standard input is read
                 line = re.sub(findPattern, replacePattern, line)
                 sys.stdout.write(line)
             if can_access_file(backupFile):

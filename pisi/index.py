@@ -13,6 +13,7 @@
 """PiSi source/package index"""
 
 import os
+import re
 import shutil
 import multiprocessing
 
@@ -37,15 +38,16 @@ import pisi.operations.build
 class Error(pisi.Error):
     pass
 
+
 class Index(xmlfile.XmlFile, metaclass=autoxml.autoxml):
     tag = "PISI"
 
-    t_Distribution = [ component.Distribution, autoxml.optional ]
-    t_Specs = [ [specfile.SpecFile], autoxml.optional, "SpecFile"]
-    t_Packages = [ [metadata.Package], autoxml.optional, "Package"]
-    #t_Metadatas = [ [metadata.MetaData], autoxml.optional, "MetaData"]
-    t_Components = [ [component.Component], autoxml.optional, "Component"]
-    t_Groups = [ [group.Group], autoxml.optional, "Group"]
+    t_Distribution = [component.Distribution, autoxml.optional]
+    t_Specs = [[specfile.SpecFile], autoxml.optional, "SpecFile"]
+    t_Packages = [[metadata.Package], autoxml.optional, "Package"]
+    # t_Metadatas = [ [metadata.MetaData], autoxml.optional, "MetaData"]
+    t_Components = [[component.Component], autoxml.optional, "Component"]
+    t_Groups = [[group.Group], autoxml.optional, "Group"]
 
     def read_uri(self, uri, tmpdir, force = False):
         return self.read(uri, tmpDir=tmpdir, sha1sum=not force,
@@ -54,7 +56,7 @@ class Index(xmlfile.XmlFile, metaclass=autoxml.autoxml):
                          copylocal=True, nodecode=True)
 
     # read index for a given repo, force means download even if remote not updated
-    def read_uri_of_repo(self, uri, repo = None, force = False):
+    def read_uri_of_repo(self, uri, repo=None, force=False):
         """Read PSPEC file"""
         if repo:
             tmpdir = os.path.join(ctx.config.index_dir(), repo)
@@ -66,7 +68,7 @@ class Index(xmlfile.XmlFile, metaclass=autoxml.autoxml):
 
         # write uri
         urlfile = open(pisi.util.join_path(tmpdir, 'uri'), 'w')
-        urlfile.write(uri) # uri
+        urlfile.write(uri)  # uri
         urlfile.close()
 
         doc = self.read_uri(uri, tmpdir, force)
@@ -75,7 +77,7 @@ class Index(xmlfile.XmlFile, metaclass=autoxml.autoxml):
             repo = self.distribution.name()
             # and what do we do with it? move it to index dir properly
             newtmpdir = os.path.join(ctx.config.index_dir(), repo)
-            pisi.util.clean_dir(newtmpdir) # replace newtmpdir
+            pisi.util.clean_dir(newtmpdir)  # replace newtmpdir
             shutil.move(tmpdir, newtmpdir)
 
     def check_signature(self, filename, repo):
@@ -88,6 +90,27 @@ class Index(xmlfile.XmlFile, metaclass=autoxml.autoxml):
         packages = []
         specs = []
         deltas = {}
+
+        pkgs_sorted = False
+
+        for fn in next(os.walk(repo_uri))[2]:
+            if fn.endswith(ctx.const.delta_package_suffix) or fn.endswith(ctx.const.package_suffix):
+                name, version = util.parse_package_name(fn)
+                if name.split("-").pop() in ["devel", "32bit", "doc", "docs", "userspace"]:
+                    name = name[:-1 - len(name.split("-").pop())]
+                pkgpath = os.path.join(repo_uri,
+                                       name[0:4].lower() if name.startswith("lib") and len(name) > 3 else name.lower()[0],
+                                       name.lower())
+                if not os.path.isdir(pkgpath):
+                    os.makedirs(pkgpath)
+                ctx.ui.info("%-80.80s\r" % (_('Sorting: %s ') % fn),
+                            noln=False if ctx.config.get_option("verbose") else True)
+                shutil.copy2(os.path.join(repo_uri, fn), pkgpath)
+                os.remove(os.path.join(repo_uri, fn))
+                pkgs_sorted = True
+
+        if pkgs_sorted:
+            ctx.ui.info("%-80.80s\r" % '')
 
         for root, dirs, files in os.walk(repo_uri):
             # Filter hidden directories
@@ -154,14 +177,26 @@ class Index(xmlfile.XmlFile, metaclass=autoxml.autoxml):
 
         # Before calling pool.map check if list is empty or not: python#12157
         if latest_packages:
-            try:
-                # Add binary packages to index using a process pool
-                self.packages = pool.map(add_package, latest_packages)
-            except:
-                pool.terminate()
-                pool.join()
-                ctx.ui.info("")
-                raise
+            sorted_pkgs = {}
+            for pkg in latest_packages:
+                key = re.search("\/((lib)?[\d\w])\/", pkg[0])
+                key = key.group(1) if key else os.path.dirname(pkg[0])
+                try:
+                    sorted_pkgs[key].append(pkg)
+                except KeyError:
+                    sorted_pkgs[key] = [pkg]
+            self.packages = []
+            for key, pkgs in sorted(sorted_pkgs.items()):
+                ctx.ui.info("%-80.80s\r" % (_("Adding packages from directory %s... " % key)), noln=True)
+                try:
+                    # Add binary packages to index using a process pool
+                    self.packages.extend(pool.map(add_package, pkgs))
+                except:
+                    pool.terminate()
+                    pool.join()
+                    ctx.ui.info("")
+                    raise
+                ctx.ui.info("%-80.80s\r" % (_("Adding packages from directory %s... done." % key)))
 
         ctx.ui.info("")
         pool.close()
