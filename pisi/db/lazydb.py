@@ -38,7 +38,7 @@ class Singleton(object):
 
 class LazyDB(Singleton):
 
-    cache_version = "2.4"
+    cache_version = "3.0.0"
 
     def __init__(self, cacheable=False, cachedir=None):
         if "initialized" not in self.__dict__:
