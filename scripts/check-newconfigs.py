@@ -12,7 +12,6 @@
 
 import os
 import sys
-import exceptions
 
 import pisi
 
@@ -63,22 +62,25 @@ def show_changes(package, changed):
             if answer == "?":
                 os.system("diff -u %s %s | less" % (file, file + ".newconfig"))
 
+
 def check_package(package):
     changed = check_changed_config_files(package)
     if changed:
         show_changes(package, changed)
+
 
 def check_changes():
     packages = get_installed_packages()
     for pkg in packages:
         check_package(pkg)
 
+
 if __name__ == "__main__":
-     if len(sys.argv) == 1:
-         print("Checking all packages")
-         check_changes()
-     if len(sys.argv) == 2:
-         check_package(sys.argv[1])
-     if len(sys.argv) > 2:
-         for pkg in sys.argv[1:]:
-             check_package(pkg)
+    if len(sys.argv) == 1:
+        print("Checking all packages")
+        check_changes()
+    if len(sys.argv) == 2:
+        check_package(sys.argv[1])
+    if len(sys.argv) > 2:
+        for pkg in sys.argv[1:]:
+            check_package(pkg)

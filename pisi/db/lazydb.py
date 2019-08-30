@@ -36,6 +36,7 @@ class Singleton(object):
         #FIXME: After invalidate, previously initialized db object becomes stale
         del self._the_instances[type(self).__name__]
 
+
 class LazyDB(Singleton):
 
     cache_version = "3.0.0"
