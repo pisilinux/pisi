@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #
 # Author: Marcin Bojara <marcin@pisilinux.org>
@@ -94,7 +94,7 @@ if __name__ == "__main__":
                     ver = f.readline().split(":").pop().strip()
                     paths = [l.strip() for l in f.readlines()]
                 oldpkgfs["%s-%s (previous)" % (ls, ver)] = paths
-    except AttributeError:
+    except AttributeError as e:
         print("%sYour pisi version is too old.%s" % (GR, NO))
 
     print("  done.")
@@ -116,7 +116,7 @@ if __name__ == "__main__":
             soname_search = args
         sonames = " ".join(soname_search)
         m = hashlib.md5()
-        m.update(sonames)
+        m.update(sonames.encode())
         llist = LIST + "_" + m.hexdigest()[:8]
         head_text = "using given shared object(s) name"
         ok_text = "There are no dynamic links to %s" % sonames
@@ -180,7 +180,7 @@ if __name__ == "__main__":
                 continue
             p = subprocess.Popen('LD_LIBRARY_PATH="$COMPLETE_LD_LIBRARY_PATH" ldd %s' % f, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             out, err = p.communicate()
-            for line in out.split("\n"):
+            for line in out.decode().split("\n"):
                 if "=>" in line:
                     src, dst = line.split("=>")
                     src = src.strip()

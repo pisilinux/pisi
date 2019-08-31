@@ -137,8 +137,9 @@ class Install(AtomicOperation):
         self.filesdb = pisi.db.filesdb.FilesDB()
         self.installdb = pisi.db.installdb.InstallDB()
         self.operation = INSTALL
+        self.store_old_paths = None
 
-    def install(self, ask_reinstall = True):
+    def install(self, ask_reinstall=True):
 
         # Any package should remove the package it replaces before
         self.check_replaces()
@@ -244,6 +245,10 @@ class Install(AtomicOperation):
             else:
                 pkg_version = pisi.version.make_version(pkg.version)
                 iversion = pisi.version.make_version(iversion_s)
+                if ctx.get_option('store_lib_info') and pkg_version > iversion:
+                    self.store_old_paths = os.path.join(ctx.config.old_paths_cache_dir(), pkg.name)
+                    ctx.ui.info(_('Storing old paths info'))
+                    open(self.store_old_paths, "w").write("Version: %s\n" % iversion_s)
 
                 pkg_release = int(pkg.release)
                 irelease = int(irelease_s)
@@ -274,7 +279,7 @@ class Install(AtomicOperation):
             self.old_files = self.installdb.get_files(pkg.name)
             self.old_pkginfo = self.installdb.get_info(pkg.name)
             self.old_path = self.installdb.pkg_dir(pkg.name, iversion_s, irelease_s)
-            self.remove_old = Remove(pkg.name)
+            self.remove_old = Remove(pkg.name, store_old_paths = self.store_old_paths)
             self.remove_old.run_preremove()
             self.remove_old.run_postremove()
 
@@ -446,7 +451,7 @@ class Install(AtomicOperation):
                     if os.path.samestat(new_file_stat, old_file_stat):
                         break
                 else:
-                    Remove.remove_file(old_file, self.pkginfo.name)
+                    Remove.remove_file(old_file, self.pkginfo.name, store_old_paths=self.store_old_paths)
 
         if self.reinstall():
             # get 'config' typed file objects
@@ -554,12 +559,13 @@ def install_single_name(name, upgrade = False):
 
 class Remove(AtomicOperation):
 
-    def __init__(self, package_name, ignore_dep = None):
+    def __init__(self, package_name, ignore_dep=None, store_old_paths=None):
         super(Remove, self).__init__(ignore_dep)
         self.installdb = pisi.db.installdb.InstallDB()
         self.filesdb = pisi.db.filesdb.FilesDB()
         self.package_name = package_name
         self.package = self.installdb.get_package(self.package_name)
+        self.store_old_paths = store_old_paths
         try:
             self.files = self.installdb.get_files(self.package_name)
         except pisi.Error as e:
@@ -599,7 +605,7 @@ class Remove(AtomicOperation):
         # is there any package who depends on this package?
 
     @staticmethod
-    def remove_file(fileinfo, package_name, remove_permanent=False):
+    def remove_file(fileinfo, package_name, remove_permanent=False, store_old_paths=None):
 
         if fileinfo.permanent and not remove_permanent:
             return
@@ -640,6 +646,8 @@ class Remove(AtomicOperation):
         else:
             if os.path.isfile(fpath) or os.path.islink(fpath):
                 os.unlink(fpath)
+                if store_old_paths:
+                    open(store_old_paths, "a").write("%s\n" % fpath)
             elif os.path.isdir(fpath) and not os.listdir(fpath):
                 os.rmdir(fpath)
             else:

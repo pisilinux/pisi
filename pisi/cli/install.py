@@ -65,6 +65,9 @@ expanded to package names.
                      help=_("When installing packages, ignore packages "
                             "and components whose basenames match "
                             "any pattern contained in file."))
+        group.add_option("-s", "--store-lib-info", action="store_true",
+                         default=False,
+                         help=_("Store previous libraries info when package is updating to newer version."))
         self.parser.add_option_group(group)
 
     def run(self):

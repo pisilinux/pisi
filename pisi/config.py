@@ -130,6 +130,9 @@ class Config(object, metaclass=pisi.util.Singleton):
     def debug_packages_dir(self):
         return self.subdir(self.values.dirs.debug_packages_dir)
 
+    def old_paths_cache_dir(self):
+        return self.subdir(self.values.dirs.old_paths_cache_dir)
+
     def index_dir(self):
         return self.subdir(self.values.dirs.index_dir)
 
