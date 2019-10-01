@@ -17,46 +17,35 @@
 # Configuration file is located in /etc/pisi/pisi.conf by default,
 # having an INI like format like below.
 #
-#[general]
-#destinationdirectory = /
-#autoclean = False
-#bandwidth_limit = 0
+# [general]
+# destinationdirectory = /
+# autoclean = False
+# bandwidth_limit = 0
 #
-#[build]
-#host = i686-pc-linux-gnu
-#generateDebug = False
-#enableSandbox = False
-#jobs = "-j3"
-#cflags= -mtune=generic -march=i686 -O2 -pipe -fomit-frame-pointer -fstack-protector -D_FORTIFY_SOURCE=2
-#cxxflags= -mtune=generic -march=i686 -O2 -pipe -fomit-frame-pointer -fstack-protector -D_FORTIFY_SOURCE=2
-#ldflags= -Wl,-O1 -Wl,-z,relro -Wl,--hash-style=gnu -Wl,--as-needed -Wl,--sort-common
-#ar = "ar"
-#assembler = "as"
-#cc = "gcc"
-#cxx = "g++"
-#ld = "ld"
-#nm = "nm"
-#ranlib = "ranlib"
-#f77 = "g77"
-#gcj = "gcj"
-#strip = "strip"
-#objcopy= "objcopy"
-#buildhelper = None / ccache / icecream
-#compressionlevel = 1
-#fallback = "ftp://ftp.pardus.org.tr/pub/source/2011"
+# [build]
+# host = i686-pc-linux-gnu
+# generateDebug = False
+# enableSandbox = False
+# jobs = "-j3"
+# CFLAGS= -mtune=generic -march=i686 -O2 -pipe -fomit-frame-pointer -fstack-protector -D_FORTIFY_SOURCE=2
+# CXXFLAGS= -mtune=generic -march=i686 -O2 -pipe -fomit-frame-pointer -fstack-protector -D_FORTIFY_SOURCE=2
+# LDFLAGS= -Wl,-O1 -Wl,-z,relro -Wl,--hash-style=gnu -Wl,--as-needed -Wl,--sort-common
+# buildhelper = None / ccache / icecream
+# compressionlevel = 1
+# fallback = "ftp://ftp.pardus.org.tr/pub/source/2009"
 #
-#[directories]
-#lib_dir = /var/lib/pisi
-#info_dir = "/var/lib/pisi/info"
-#history_dir = /var/lib/pisi/history
-#archives_dir = /var/cache/pisi/archives
-#cached_packages_dir = /var/cache/pisi/packages
-#compiled_packages_dir = "/var/cache/pisi/packages"
-#index_dir = /var/cache/pisi/index
-#packages_dir = /var/cache/pisi/package
-#tmp_dir = /var/pisi
-#kde_dir = /usr/kde/4
-#qt_dir = /usr/qt/4
+# [directories]
+# lib_dir = /var/lib/pisi
+# info_dir = "/var/lib/pisi/info"
+# history_dir = /var/lib/pisi/history
+# archives_dir = /var/cache/pisi/archives
+# cached_packages_dir = /var/cache/pisi/packages
+# compiled_packages_dir = "/var/cache/pisi/packages"
+# index_dir = /var/cache/pisi/index
+# packages_dir = /var/cache/pisi/package
+# tmp_dir = /var/pisi
+# kde_dir = /usr/kde/4
+# qt_dir = /usr/qt/4
 
 import os
 import re
@@ -98,20 +87,6 @@ class BuildDefaults:
     enableSandbox = True
     cflags = "-mtune=generic -march=i686 -O2 -pipe -fomit-frame-pointer -fstack-protector -D_FORTIFY_SOURCE=2"
     cxxflags = "-mtune=generic -march=i686 -O2 -pipe -fomit-frame-pointer -fstack-protector -D_FORTIFY_SOURCE=2"
-
-    # Toolchain defaults
-    ar = "ar"
-    assembler = "as"
-    cc = "gcc"
-    cxx = "g++"
-    ld = "ld"
-    nm = "nm"
-    ranlib = "ranlib"
-    f77 = "g77"
-    gcj = "gcj"
-    strip = "strip"
-    objcopy= "objcopy"
-
     ldflags = "-Wl,-O1 -Wl,-z,relro -Wl,--hash-style=gnu -Wl,--as-needed -Wl,--sort-common"
     buildhelper = None
     compressionlevel = 1
@@ -133,7 +108,7 @@ class DirectoriesDefaults:
     packages_dir = "/var/lib/pisi/package"
     lock_dir = "/var/lock/subsys"
     index_dir = "/var/lib/pisi/index"
-    tmp_dir =  "/var/pisi"
+    tmp_dir = "/var/pisi"
     kde_dir = "/usr/kde/4"
     qt_dir = "/usr/qt/4"
 
@@ -322,7 +297,7 @@ class ConfigurationFile(object):
                 else:
                     output = current
                     if len(written) > 0:
-                    	output.write("\n")
+                        output.write("\n")
                     output.write("[%s]\n" % (sect,))
                     sections[sect] = None
                 for opt in opts:
@@ -340,4 +315,3 @@ class ConfigurationFile(object):
                 fp.write(sect.getvalue())
 
         fp.close()
-        

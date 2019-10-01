@@ -19,7 +19,6 @@ _ = __trans.gettext
 
 # PiSi Modules
 import pisi.actionsapi
-import pisi.util
 import pisi.context as ctx
 
 # ActionsAPI Modules
@@ -31,10 +30,10 @@ class BinutilsError(pisi.actionsapi.Error):
         self.value = value
         ctx.ui.error(value)
 
+
 # Globals
 env = pisi.actionsapi.variables.glb.env
 dirs = pisi.actionsapi.variables.glb.dirs
-config = pisi.actionsapi.variables.glb.config
 generals = pisi.actionsapi.variables.glb.generals
 
 def curDIR():
@@ -168,29 +167,49 @@ def qtDIR():
 
 # Binutils Variables
 
+def existBinary(bin):
+    # determine if path has binary
+    path = os.environ['PATH'].split(':')
+    for directory in path:
+        if os.path.exists(os.path.join(directory, bin)):
+            return True
+    return False
+
+def getBinutilsInfo(util):
+    cross_build_name = '%s-%s' % (HOST(), util)
+    if not existBinary(cross_build_name):
+        if not existBinary(util):
+            raise BinutilsError(_('Util %s cannot be found') % util)
+        else:
+            ctx.ui.debug(_('Warning: %s does not exist, using plain name %s') \
+                     % (cross_build_name, util))
+            return util
+    else:
+        return cross_build_name
+
 def AR():
-    return config.values.build.ar
+    return getBinutilsInfo('ar')
 
 def AS():
-    return config.values.build.assembler
+    return getBinutilsInfo('as')
 
 def CC():
-    return config.values.build.cc
+    return getBinutilsInfo('gcc')
 
 def CXX():
-    return config.values.build.cxx
+    return getBinutilsInfo('g++')
 
 def LD():
-    return config.values.build.ld
+    return getBinutilsInfo('ld')
 
 def NM():
-    return config.values.build.nm
+    return getBinutilsInfo('nm')
 
 def RANLIB():
-    return config.values.build.ranlib
+    return getBinutilsInfo('ranlib')
 
 def F77():
-    return config.values.build.f77
+    return getBinutilsInfo('g77')
 
 def GCJ():
-    return config.values.build.gcj
+    return getBinutilsInfo('gcj')
