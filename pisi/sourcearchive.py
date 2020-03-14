@@ -47,8 +47,8 @@ class SourceArchive:
     and unpacking a source archive"""
     def __init__(self, archive):
         self.url = pisi.uri.URI(archive.uri)
-        self.archiveFile = os.path.join(ctx.config.archives_dir(), self.url.filename())
         self.archive = archive
+        self.archiveFile = os.path.join(ctx.config.archives_dir(), self.archive.name)
 
     def fetch(self, interactive=True):
         if not self.is_cached(interactive):
@@ -62,15 +62,14 @@ class SourceArchive:
                 if self.url.get_uri().startswith("mirrors://"):
                     self.fetch_from_mirror()
                 else:
-                    pisi.fetcher.fetch_url(self.url, ctx.config.archives_dir(), self.progress)
+                    pisi.fetcher.fetch_url(self.url, ctx.config.archives_dir(), self.progress, self.archive.name)
             except pisi.fetcher.FetchError:
                 if ctx.config.values.build.fallback:
                     self.fetch_from_fallback()
                 else:
                     raise
 
-            ctx.ui.info(_("Source archive is stored: %s/%s")
-                % (ctx.config.archives_dir(), self.url.filename()))
+            ctx.ui.info(_("Source archive is stored: %s/%s") % (ctx.config.archives_dir(), self.archive.name))
 
     def fetch_from_fallback(self):
         archive = os.path.basename(self.url.get_uri())

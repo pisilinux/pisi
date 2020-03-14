@@ -149,15 +149,17 @@ class ComarProvide(metaclass=autoxml.autoxml):
         s += ' (' + self.om + '%s' % (' for %s' % self.name if self.name else '') + ')'
         return s
 
-class Archive(metaclass=autoxml.autoxml):
 
-    s_uri = [ autoxml.String, autoxml.mandatory ]
-    a_type = [ autoxml.String, autoxml.optional ]
-    a_sha1sum =[ autoxml.String, autoxml.mandatory ]
-    a_target =[ autoxml.String, autoxml.optional ]
+class Archive(metaclass=autoxml.autoxml):
+    s_uri = [autoxml.String, autoxml.mandatory]
+    a_type = [autoxml.String, autoxml.optional]
+    a_sha1sum = [autoxml.String, autoxml.mandatory]
+    a_target = [autoxml.String, autoxml.optional]
+    a_name = [autoxml.String, autoxml.optional]
 
     def decode_hook(self, node, errs, where):
-        self.name = os.path.basename(self.uri)
+        if not self.name:
+            self.name = os.path.basename(self.uri)
 
     def __str__(self):
         s = _('URI: %s, type: %s, sha1sum: %s') % (self.uri, self.type, self.sha1sum)
