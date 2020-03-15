@@ -1,5 +1,5 @@
-# PISI - Packages Installed Succesfully as Intended
-PISI is a package manager. In Turkish PISI means "kitty", and like a kitty, it is featureful and small.
+# PISI ![Maintenance](https://img.shields.io/maintenance/yes/2020) ![GitHub last commit](https://img.shields.io/github/last-commit/pisilinux/pisi)
+PISI (Packages Installed Succesfully as Intended) is a package manager. In Turkish PISI means "kitty", and like a kitty, it is featureful and small.
 
 Some of its distinctive features:
 
